@@ -17,10 +17,19 @@ class User extends Authenticatable
      *
      * @var list<string>
      */
+    protected $table = 'users';
+
     protected $fillable = [
+        'role_id',
         'name',
-        'email',
+        'username',
         'password',
+        'nik',
+        'address',
+        'city',
+        'phone',
+        'profile_photo',
+        'status',
     ];
 
     /**
@@ -43,6 +52,7 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'status' => 'boolean',
         ];
     }
 }

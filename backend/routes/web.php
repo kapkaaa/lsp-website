@@ -8,6 +8,7 @@ use App\Http\Controllers\TypeController;
 use App\Http\Controllers\OperationalHourController;
 use App\Http\Controllers\ProductDetailController;
 use App\Http\Controllers\ProductPhotoController;
+use App\Http\Controllers\UserController;
 
 /*
 |--------------------------------------------------------------------------
@@ -39,8 +40,5 @@ Route::prefix('admin')->group(function () {
 
     // Settings routes
     Route::resource('operational-hours', OperationalHourController::class);
-    Route::get('/users', function () {
-        $users = collect([]); // Mock data for testing
-        return view('users.index', compact('users'));
-    })->name('users.index'); // We'll create this view later
+    Route::resource('users', UserController::class);
 });
