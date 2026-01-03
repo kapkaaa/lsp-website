@@ -26,8 +26,8 @@
                                 <th>Name</th>
                                 <th>Brand</th>
                                 <th>Type</th>
-                                <th>Price</th>
-                                <th>Stock</th>
+                                <th>Cost Price</th>
+                                <th>Selling Price</th>
                                 <th>Created At</th>
                                 <th>Actions</th>
                             </tr>
@@ -39,22 +39,12 @@
                                 <td>{{ $product->name }}</td>
                                 <td>{{ $product->brand->name }}</td>
                                 <td>{{ $product->type->name }}</td>
-                                <td>Rp {{ number_format($product->price, 2) }}</td>
-                                <td>
-                                    <span class="badge 
-                                        @if($product->stock == 0) 
-                                            bg-danger 
-                                        @elseif($product->stock < 5) 
-                                            bg-warning 
-                                        @else 
-                                            bg-success 
-                                        @endif">
-                                        {{ $product->stock }}
-                                    </span>
-                                </td>
+                                <td>Rp {{ number_format($product->cost_price, 2) }}</td>
+                                <td>Rp {{ number_format($product->selling_price, 2) }}</td>
                                 <td>{{ $product->created_at->format('M d, Y') }}</td>
                                 <td>
                                     <a href="{{ route('products.edit', $product->id) }}" class="btn btn-sm btn-primary">Edit</a>
+                                    <a href="{{ route('product-details.index') }}?product_id={{ $product->id }}" class="btn btn-sm btn-info">Details</a>
                                     <form action="{{ route('products.destroy', $product->id) }}" method="POST" class="d-inline">
                                         @csrf
                                         @method('DELETE')

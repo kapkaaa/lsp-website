@@ -7,9 +7,11 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Brand extends Model
 {
+    protected $table = 'brands';
+
     protected $fillable = [
         'name',
-        'description'
+        'information'
     ];
 
     public function products(): HasMany
