@@ -14,14 +14,19 @@ class DashboardController extends Controller
     public function index()
     {
         // Get sales data (for demonstration, we'll simulate data)
-        $salesData = [
+        $salesData = collect([
             ['month' => 'Jan', 'sales' => 120],
             ['month' => 'Feb', 'sales' => 190],
             ['month' => 'Mar', 'sales' => 150],
             ['month' => 'Apr', 'sales' => 200],
             ['month' => 'May', 'sales' => 180],
             ['month' => 'Jun', 'sales' => 220],
-        ];
+        ]);
+
+        // $salesData = DB::table('sales')
+        //     ->select(DB::raw("DATE_FORMAT(sale_date, '%Y-%m') as month"), DB::raw('SUM(quantity) as sales'))
+        //     ->groupBy('month')
+        //     ->get();
 
         // Get best selling products (for demonstration, we'll simulate data)
         $bestSellingProducts = [
