@@ -6,6 +6,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use App\Models\Role;
 
 class UserController extends Controller
 {
@@ -16,8 +17,9 @@ class UserController extends Controller
     }
 
     public function create()
-    {
-        return view('users.create');
+    {   
+        $roles = Role::all();
+        return view('users.create', compact('roles'));
     }
 
     public function store(Request $request)
@@ -27,12 +29,12 @@ class UserController extends Controller
             'name' => 'required|string|max:255',
             'username' => 'required|string|max:255|unique:users',
             'password' => 'required|string|min:8|confirmed',
-            'nik' => 'required|string|max:255',
+            'nik' => 'required|integer|digits:18',
             'address' => 'required|string',
             'city' => 'required|string|max:255',
-            'phone' => 'required|string|max:20',
+            'phone' => 'required|digits_between:10,15',
             'profile_photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'status' => 'required|boolean'
+            'status' => 'required|string'
         ]);
 
         if ($validator->fails()) {
@@ -59,7 +61,8 @@ class UserController extends Controller
 
     public function edit(User $user)
     {
-        return view('users.edit', compact('user'));
+        $roles = Role::all();
+        return view('users.edit', compact('user', 'roles'));
     }
 
     public function update(Request $request, User $user)
@@ -74,7 +77,7 @@ class UserController extends Controller
             'city' => 'required|string|max:255',
             'phone' => 'required|string|max:20',
             'profile_photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'status' => 'required|boolean'
+            'status' => 'required|string'
         ]);
 
         if ($validator->fails()) {

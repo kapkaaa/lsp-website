@@ -22,12 +22,24 @@
                     <div class="card-body">
                         <div class="row">
                             <div class="col-md-6">
-                                <div class="form-group">
-                                    <label for="role_id">Role ID</label>
-                                    <input type="number" name="role_id" class="form-control @error('role_id') is-invalid @enderror" 
-                                           id="role_id" placeholder="Enter Role ID" value="{{ old('role_id', $user->role_id) }}" required>
+                            <div class="form-group">
+                                    <label for="role_id">Role</label>
+                                    <select name="role_id" id="role_id"
+                                        class="form-control @error('role_id') is-invalid @enderror" required>
+
+                                        <option value="">-- Pilih Role --</option>
+
+                                        @foreach ($roles as $role)
+                                        <option value="{{ $role->id }}"
+                                            {{ old('role_id', $user->role_id) == $role->id ? 'selected' : '' }}>
+                                            {{ $role->name }}
+                                        </option>
+                                        @endforeach
+
+                                    </select>
+
                                     @error('role_id')
-                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
                                 </div>
                                 
@@ -108,8 +120,8 @@
                                 <div class="form-group">
                                     <label for="status">Status</label>
                                     <select name="status" class="form-control @error('status') is-invalid @enderror" id="status" required>
-                                        <option value="1" {{ old('status', $user->status) == 1 ? 'selected' : '' }}>Active</option>
-                                        <option value="0" {{ old('status', $user->status) == 0 ? 'selected' : '' }}>Inactive</option>
+                                        <option value="active" {{ old('status', $user->status) == 'active' ? 'selected' : '' }}>Active</option>
+                                        <option value="inactive" {{ old('status', $user->status) == 'inactive' ? 'selected' : '' }}>Inactive</option>
                                     </select>
                                     @error('status')
                                         <div class="invalid-feedback">{{ $message }}</div>
