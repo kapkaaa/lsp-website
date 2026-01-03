@@ -10,7 +10,6 @@
 <div class="container-fluid">
     <div class="row">
         <div class="col-lg-3 col-6">
-            <!-- small box -->
             <div class="small-box bg-info">
                 <div class="inner">
                     <h3>{{ $totalProducts }}</h3>
@@ -22,9 +21,8 @@
                 <a href="{{ route('products.index') }}" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
             </div>
         </div>
-        <!-- ./col -->
+
         <div class="col-lg-3 col-6">
-            <!-- small box -->
             <div class="small-box bg-success">
                 <div class="inner">
                     <h3>{{ $totalBrands }}</h3>
@@ -36,9 +34,8 @@
                 <a href="{{ route('brands.index') }}" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
             </div>
         </div>
-        <!-- ./col -->
+
         <div class="col-lg-3 col-6">
-            <!-- small box -->
             <div class="small-box bg-warning">
                 <div class="inner">
                     <h3>{{ $totalTypes }}</h3>
@@ -50,9 +47,8 @@
                 <a href="{{ route('types.index') }}" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
             </div>
         </div>
-        <!-- ./col -->
+
         <div class="col-lg-3 col-6">
-            <!-- small box -->
             <div class="small-box bg-danger">
                 <div class="inner">
                     <h3>{{ $lowStockProducts->count() }}</h3>
@@ -64,7 +60,6 @@
                 <a href="{{ route('products.index') }}" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
             </div>
         </div>
-        <!-- ./col -->
     </div>
 
     <div class="row">
@@ -81,18 +76,14 @@
                         </button>
                     </div>
                 </div>
-                <!-- /.card-header -->
                 <div class="card-body">
                     <div class="chart-responsive">
-                        <canvas id="salesChart" height="300" style="height: 300px;"></canvas>
+                        <canvas id="salesChart" height="300"></canvas>
                     </div>
-                    <!-- ./chart-responsive -->
                 </div>
-                <!-- /.card-body -->
             </div>
-            <!-- /.card -->
         </div>
-        <!-- /.col -->
+
         <div class="col-md-4">
             <div class="card">
                 <div class="card-header">
@@ -106,39 +97,33 @@
                         </button>
                     </div>
                 </div>
-                <!-- /.card-header -->
                 <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-12">
-                            <div class="table-responsive">
-                                <table class="table table-hover">
-                                    <thead>
-                                        <tr>
-                                            <th>Product</th>
-                                            <th>Sales</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @foreach($bestSellingProducts as $product)
-                                        <tr>
-                                            <td>{{ $product['name'] }}</td>
-                                            <td>{{ $product['sales'] }} items</td>
-                                        </tr>
-                                        @endforeach
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Product</th>
+                                    <th>Sales</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($bestSellingProducts as $product)
+                                <tr>
+                                    <td>{{ $product['name'] }}</td>
+                                    <td>{{ $product['sales'] }} items</td>
+                                </tr>
+                                <tr>
+                                    <td colspan="2" class="text-center">No sales data</td>
+                                </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
                     </div>
                 </div>
-                <!-- /.card-body -->
             </div>
-            <!-- /.card -->
         </div>
-        <!-- /.col -->
     </div>
 
-    <!-- Low Stock Products -->
     <div class="row">
         <div class="col-12">
             <div class="card">
@@ -150,7 +135,6 @@
                         </button>
                     </div>
                 </div>
-                <!-- /.card-header -->
                 <div class="card-body table-responsive p-0">
                     <table class="table table-hover">
                         <thead>
@@ -163,7 +147,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @forelse($lowStockProducts as $product)
+                            @foreach($lowStockProducts as $product)
                             <tr class="table-warning">
                                 <td>{{ $product->name ?? '-' }}</td>
                                 <td>{{ $product->brand?->name ?? '-' }}</td>
@@ -171,10 +155,9 @@
                                 <td>{{ $product->stock ?? 0 }}</td>
                                 <td><span class="badge bg-warning">Low Stock</span></td>
                             </tr>
-                            @empty
-                            @endforelse
+                            @endforeach
 
-                            @forelse($outOfStockProducts as $product)
+                            @foreach($outOfStockProducts as $product)
                             <tr class="table-danger">
                                 <td>{{ $product->name ?? '-' }}</td>
                                 <td>{{ $product->brand?->name ?? '-' }}</td>
@@ -182,79 +165,75 @@
                                 <td>{{ $product->stock ?? 0 }}</td>
                                 <td><span class="badge bg-danger">Out of Stock</span></td>
                             </tr>
-                            @empty
-                            @endforelse
+                            @endforeach
 
-                            @if($lowStockProducts->count() == 0 && $outOfStockProducts->count() == 0)
+                            @if($lowStockProducts->isEmpty() && $outOfStockProducts->isEmpty())
                             <tr>
-                                <td colspan="5" class="text-center">No low stock or out of stock products</td>
+                                <td colspan="5" class="text-center">
+                                    No low stock or out of stock products
+                                </td>
                             </tr>
                             @endif
                         </tbody>
+
                     </table>
                 </div>
-                <!-- /.card-body -->
             </div>
-            <!-- /.card -->
         </div>
     </div>
 </div>
 @stop
 
 @section('css')
-{{-- Add here extra stylesheets --}}
-{{-- <link rel="stylesheet" href="/css/admin_custom.css"> --}}
+{{-- Tambahkan CSS kustom di sini jika diperlukan --}}
 @stop
 
 @section('js')
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-    // Get the context of the canvas element we want to select
-    var ctx = document.getElementById('salesChart').getContext('2d');
+    document.addEventListener('DOMContentLoaded', function() {
+        const ctx = document.getElementById('salesChart').getContext('2d');
 
-    // Create the chart
-    var salesChart = new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: [
-                @foreach($salesData as $data)
-                '{{ $data['month'] }}',
-                @endforeach
-            ],
-            datasets: [{
-                label: 'Sales',
-                data: [
-                    @foreach($salesData as $data) {
-                        {
-                            $data['sales']
-                        }
-                    },
-                    @endforeach
-                ],
-                backgroundColor: 'rgba(60, 141, 188, 0.1)',
-                borderColor: 'rgba(60, 141, 188, 1)',
-                borderWidth: 2,
-                pointRadius: 3,
-                pointBackgroundColor: 'rgba(60, 141, 188, 1)',
-                pointBorderColor: '#fff',
-                pointBorderWidth: 1,
-                fill: true
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    display: true
-                }
+        // Pastikan data tersedia
+        const labels = @json(collect($salesData)->pluck('month'));
+        const sales = @json(collect($salesData)->pluck('sales'));
+
+
+        const salesChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Sales',
+                    data: sales,
+                    backgroundColor: 'rgba(60, 141, 188, 0.1)',
+                    borderColor: 'rgba(60, 141, 188, 1)',
+                    borderWidth: 2,
+                    pointRadius: 3,
+                    pointBackgroundColor: 'rgba(60, 141, 188, 1)',
+                    pointBorderColor: '#fff',
+                    pointBorderWidth: 1,
+                    fill: true
+                }]
             },
-            scales: {
-                y: {
-                    beginAtZero: true
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: true
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            precision: 0
+                        }
+                    }
                 }
             }
-        }
+        });
     });
 </script>
 @stop
