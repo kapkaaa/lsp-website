@@ -3,7 +3,7 @@
 @section('title', 'Dashboard')
 
 @section('content_header')
-    <h1>Dashboard</h1>
+<h1>Dashboard</h1>
 @stop
 
 @section('content')
@@ -137,7 +137,7 @@
         </div>
         <!-- /.col -->
     </div>
-    
+
     <!-- Low Stock Products -->
     <div class="row">
         <div class="col-12">
@@ -165,26 +165,26 @@
                         <tbody>
                             @forelse($lowStockProducts as $product)
                             <tr class="table-warning">
-                                <td>{{ $product->name }}</td>
-                                <td>{{ $product->brand->name }}</td>
-                                <td>{{ $product->type->name }}</td>
-                                <td>{{ $product->stock }}</td>
+                                <td>{{ $product->name ?? '-' }}</td>
+                                <td>{{ $product->brand?->name ?? '-' }}</td>
+                                <td>{{ $product->type?->name ?? '-' }}</td>
+                                <td>{{ $product->stock ?? 0 }}</td>
                                 <td><span class="badge bg-warning">Low Stock</span></td>
                             </tr>
                             @empty
                             @endforelse
-                            
+
                             @forelse($outOfStockProducts as $product)
                             <tr class="table-danger">
-                                <td>{{ $product->name }}</td>
-                                <td>{{ $product->brand->name }}</td>
-                                <td>{{ $product->type->name }}</td>
-                                <td>{{ $product->stock }}</td>
+                                <td>{{ $product->name ?? '-' }}</td>
+                                <td>{{ $product->brand?->name ?? '-' }}</td>
+                                <td>{{ $product->type?->name ?? '-' }}</td>
+                                <td>{{ $product->stock ?? 0 }}</td>
                                 <td><span class="badge bg-danger">Out of Stock</span></td>
                             </tr>
                             @empty
                             @endforelse
-                            
+
                             @if($lowStockProducts->count() == 0 && $outOfStockProducts->count() == 0)
                             <tr>
                                 <td colspan="5" class="text-center">No low stock or out of stock products</td>
@@ -202,56 +202,59 @@
 @stop
 
 @section('css')
-    {{-- Add here extra stylesheets --}}
-    {{-- <link rel="stylesheet" href="/css/admin_custom.css"> --}}
+{{-- Add here extra stylesheets --}}
+{{-- <link rel="stylesheet" href="/css/admin_custom.css"> --}}
 @stop
 
 @section('js')
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script>
-        // Get the context of the canvas element we want to select
-        var ctx = document.getElementById('salesChart').getContext('2d');
-        
-        // Create the chart
-        var salesChart = new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: [
-                    @foreach($salesData as $data)
-                        '{{ $data['month'] }}',
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Get the context of the canvas element we want to select
+    var ctx = document.getElementById('salesChart').getContext('2d');
+
+    // Create the chart
+    var salesChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: [
+                @foreach($salesData as $data)
+                '{{ $data['month'] }}',
+                @endforeach
+            ],
+            datasets: [{
+                label: 'Sales',
+                data: [
+                    @foreach($salesData as $data) {
+                        {
+                            $data['sales']
+                        }
+                    },
                     @endforeach
                 ],
-                datasets: [{
-                    label: 'Sales',
-                    data: [
-                        @foreach($salesData as $data)
-                            {{ $data['sales'] }},
-                        @endforeach
-                    ],
-                    backgroundColor: 'rgba(60, 141, 188, 0.1)',
-                    borderColor: 'rgba(60, 141, 188, 1)',
-                    borderWidth: 2,
-                    pointRadius: 3,
-                    pointBackgroundColor: 'rgba(60, 141, 188, 1)',
-                    pointBorderColor: '#fff',
-                    pointBorderWidth: 1,
-                    fill: true
-                }]
+                backgroundColor: 'rgba(60, 141, 188, 0.1)',
+                borderColor: 'rgba(60, 141, 188, 1)',
+                borderWidth: 2,
+                pointRadius: 3,
+                pointBackgroundColor: 'rgba(60, 141, 188, 1)',
+                pointBorderColor: '#fff',
+                pointBorderWidth: 1,
+                fill: true
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: true
+                }
             },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        display: true
-                    }
-                },
-                scales: {
-                    y: {
-                        beginAtZero: true
-                    }
+            scales: {
+                y: {
+                    beginAtZero: true
                 }
             }
-        });
-    </script>
+        }
+    });
+</script>
 @stop

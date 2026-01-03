@@ -12,7 +12,7 @@ class ProductController extends Controller
 {
     public function index()
     {
-        $products = Product::with(['brand', 'type'])->get();
+        $products = Product::with(['brand', 'type', 'productDetails'])->get();
         return view('products.index', compact('products'));
     }
 
@@ -27,33 +27,24 @@ class ProductController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'price' => 'required|numeric|min:0',
-            'stock' => 'required|integer|min:0',
             'brand_id' => 'required|exists:brands,id',
             'type_id' => 'required|exists:types,id',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
+            'cost_price' => 'required|numeric|min:0',
+            'selling_price' => 'required|numeric|min:0'
         ]);
 
         if ($validator->fails()) {
             return redirect()->back()->withErrors($validator)->withInput();
         }
 
-        $data = $request->all();
-
-        if ($request->hasFile('image')) {
-            $imagePath = $request->file('image')->store('products', 'public');
-            $data['image'] = $imagePath;
-        }
-
-        Product::create($data);
+        Product::create($request->all());
 
         return redirect()->route('products.index')->with('success', 'Product created successfully.');
     }
 
     public function show(Product $product)
     {
-        $product->load(['brand', 'type']);
+        $product->load(['brand', 'type', 'productDetails.productPhotos']);
         return view('products.show', compact('product'));
     }
 
@@ -68,28 +59,17 @@ class ProductController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'price' => 'required|numeric|min:0',
-            'stock' => 'required|integer|min:0',
             'brand_id' => 'required|exists:brands,id',
             'type_id' => 'required|exists:types,id',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
+            'cost_price' => 'required|numeric|min:0',
+            'selling_price' => 'required|numeric|min:0'
         ]);
 
         if ($validator->fails()) {
             return redirect()->back()->withErrors($validator)->withInput();
         }
 
-        $data = $request->all();
-
-        if ($request->hasFile('image')) {
-            $imagePath = $request->file('image')->store('products', 'public');
-            $data['image'] = $imagePath;
-        } else {
-            unset($data['image']);
-        }
-
-        $product->update($data);
+        $product->update($request->all());
 
         return redirect()->route('products.index')->with('success', 'Product updated successfully.');
     }

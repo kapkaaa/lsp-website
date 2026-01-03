@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Product;
 use App\Models\Brand;
+use App\Models\ProductDetail;
 use App\Models\Type;
 use Illuminate\Support\Facades\DB;
 
@@ -32,10 +33,10 @@ class DashboardController extends Controller
         ];
 
         // Get products with low stock
-        $lowStockProducts = Product::where('stock', '<', 10)->where('stock', '>', 0)->get();
+        $lowStockProducts = ProductDetail::where('stock', '<', 10)->where('stock', '>', 0)->get();
 
         // Get out of stock products
-        $outOfStockProducts = Product::where('stock', 0)->get();
+        $outOfStockProducts = ProductDetail::where('stock', 0)->get();
 
         // Get counts for dashboard
         $totalProducts = Product::count();

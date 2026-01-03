@@ -16,21 +16,14 @@
                 </div>
                 <!-- /.card-header -->
                 <!-- form start -->
-                <form action="{{ route('products.update', $product->id) }}" method="POST" enctype="multipart/form-data">
+                <form action="{{ route('products.update', $product->id) }}" method="POST">
                     @csrf
                     @method('PUT')
                     <div class="card-body">
                         <div class="form-group">
                             <label for="name">Product Name</label>
-                            <input type="text" class="form-control @error('name') is-invalid @enderror" id="name" name="name" placeholder="Enter product name" value="{{ old('name', $product->name) }}">
+                            <input type="text" class="form-control @error('name') is-invalid @enderror" id="name" name="name" placeholder="Enter product name" value="{{ old('name', $product->name) }}" required>
                             @error('name')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-                        <div class="form-group">
-                            <label for="description">Description</label>
-                            <textarea class="form-control @error('description') is-invalid @enderror" id="description" name="description" rows="4" placeholder="Enter product description">{{ old('description', $product->description) }}</textarea>
-                            @error('description')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
                         </div>
@@ -38,7 +31,7 @@
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="brand_id">Brand</label>
-                                    <select class="form-control @error('brand_id') is-invalid @enderror" id="brand_id" name="brand_id">
+                                    <select class="form-control @error('brand_id') is-invalid @enderror" id="brand_id" name="brand_id" required>
                                         <option value="">Select Brand</option>
                                         @foreach($brands as $brand)
                                             <option value="{{ $brand->id }}" {{ old('brand_id', $product->brand_id) == $brand->id ? 'selected' : '' }}>{{ $brand->name }}</option>
@@ -52,7 +45,7 @@
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="type_id">Type</label>
-                                    <select class="form-control @error('type_id') is-invalid @enderror" id="type_id" name="type_id">
+                                    <select class="form-control @error('type_id') is-invalid @enderror" id="type_id" name="type_id" required>
                                         <option value="">Select Type</option>
                                         @foreach($types as $type)
                                             <option value="{{ $type->id }}" {{ old('type_id', $product->type_id) == $type->id ? 'selected' : '' }}>{{ $type->name }}</option>
@@ -67,40 +60,22 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label for="price">Price (Rp)</label>
-                                    <input type="number" step="0.01" class="form-control @error('price') is-invalid @enderror" id="price" name="price" placeholder="Enter price" value="{{ old('price', $product->price) }}">
-                                    @error('price')
+                                    <label for="cost_price">Cost Price (Rp)</label>
+                                    <input type="number" step="0.01" class="form-control @error('cost_price') is-invalid @enderror" id="cost_price" name="cost_price" placeholder="Enter cost price" value="{{ old('cost_price', $product->cost_price) }}" min="0" required>
+                                    @error('cost_price')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label for="stock">Stock</label>
-                                    <input type="number" class="form-control @error('stock') is-invalid @enderror" id="stock" name="stock" placeholder="Enter stock quantity" value="{{ old('stock', $product->stock) }}">
-                                    @error('stock')
+                                    <label for="selling_price">Selling Price (Rp)</label>
+                                    <input type="number" step="0.01" class="form-control @error('selling_price') is-invalid @enderror" id="selling_price" name="selling_price" placeholder="Enter selling price" value="{{ old('selling_price', $product->selling_price) }}" min="0" required>
+                                    @error('selling_price')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
                                 </div>
                             </div>
-                        </div>
-                        <div class="form-group">
-                            <label for="image">Product Image</label>
-                            <div class="input-group mb-3">
-                                @if($product->image)
-                                    <div class="mb-2">
-                                        <img src="{{ Storage::url($product->image) }}" alt="Current Image" width="100" class="img-thumbnail">
-                                    </div>
-                                @endif
-                                <div class="custom-file">
-                                    <input type="file" class="custom-file-input @error('image') is-invalid @enderror" id="image" name="image">
-                                    <label class="custom-file-label" for="image">Choose file</label>
-                                </div>
-                            </div>
-                            @error('image')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                            <small class="form-text text-muted">Max file size: 2MB. Allowed formats: jpeg, png, jpg, gif</small>
                         </div>
                     </div>
                     <!-- /.card-body -->
@@ -122,11 +97,5 @@
 @stop
 
 @section('js')
-    <script>
-        // Add the following code to make the file input display selected file name
-        $('.custom-file-input').on('change',function(){
-            var fileName = $(this).val().split('\\').pop();
-            $(this).next('.custom-file-label').html(fileName);
-        });
-    </script>
+    <script> console.log("Hi, I am here") </script>
 @stop

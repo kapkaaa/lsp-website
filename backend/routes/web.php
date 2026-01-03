@@ -6,6 +6,8 @@ use App\Http\Controllers\BrandController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\TypeController;
 use App\Http\Controllers\OperationalHourController;
+use App\Http\Controllers\ProductDetailController;
+use App\Http\Controllers\ProductPhotoController;
 
 /*
 |--------------------------------------------------------------------------
@@ -20,7 +22,7 @@ use App\Http\Controllers\OperationalHourController;
 
 // Public home route
 Route::get('/', function () {
-    return view('dashboard');
+    return redirect()->route('admin.dashboard');
 });
 
 // Admin routes group
@@ -31,6 +33,8 @@ Route::prefix('admin')->group(function () {
     // Master data routes
     Route::resource('brands', BrandController::class);
     Route::resource('products', ProductController::class);
+    Route::resource('product-details', ProductDetailController::class);
+    Route::resource('product-photos', ProductPhotoController::class);
     Route::resource('types', TypeController::class);
 
     // Settings routes

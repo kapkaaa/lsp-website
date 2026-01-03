@@ -4,21 +4,21 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Product extends Model
 {
     protected $fillable = [
-        'name',
-        'description',
-        'price',
-        'stock',
         'brand_id',
         'type_id',
-        'image'
+        'name',
+        'cost_price',
+        'selling_price'
     ];
 
     protected $casts = [
-        'price' => 'decimal:2',
+        'cost_price' => 'decimal:2',
+        'selling_price' => 'decimal:2',
     ];
 
     public function brand(): BelongsTo
@@ -29,5 +29,10 @@ class Product extends Model
     public function type(): BelongsTo
     {
         return $this->belongsTo(Type::class);
+    }
+
+    public function productDetails(): HasMany
+    {
+        return $this->hasMany(ProductDetail::class, 'product_id');
     }
 }
