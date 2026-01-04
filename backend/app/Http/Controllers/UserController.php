@@ -33,7 +33,6 @@ class UserController extends Controller
             'address' => 'required|string',
             'city' => 'required|string|max:255',
             'phone' => 'required|digits_between:10,15',
-            'profile_photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'status' => 'required|string'
         ]);
 
@@ -43,11 +42,6 @@ class UserController extends Controller
 
         $data = $request->all();
         $data['password'] = Hash::make($request->password);
-
-        if ($request->hasFile('profile_photo')) {
-            $photoPath = $request->file('profile_photo')->store('profile_photos', 'public');
-            $data['profile_photo'] = $photoPath;
-        }
 
         User::create($data);
 
@@ -76,7 +70,6 @@ class UserController extends Controller
             'address' => 'required|string',
             'city' => 'required|string|max:255',
             'phone' => 'required|string|max:20',
-            'profile_photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'status' => 'required|string'
         ]);
 
@@ -85,16 +78,11 @@ class UserController extends Controller
         }
 
         $data = $request->all();
-        
+
         if ($request->filled('password')) {
             $data['password'] = Hash::make($request->password);
         } else {
             unset($data['password']);
-        }
-
-        if ($request->hasFile('profile_photo')) {
-            $photoPath = $request->file('profile_photo')->store('profile_photos', 'public');
-            $data['profile_photo'] = $photoPath;
         }
 
         $user->update($data);

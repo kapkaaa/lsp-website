@@ -128,25 +128,6 @@
                                     @enderror
                                 </div>
                                 
-                                <div class="form-group">
-                                    <label for="profile_photo">Profile Photo</label>
-                                    <div class="input-group mb-3">
-                                        @if($user->profile_photo)
-                                            <div class="mb-2">
-                                                <img src="{{ Storage::url($user->profile_photo) }}" alt="Current Photo" width="100" class="img-thumbnail">
-                                            </div>
-                                        @endif
-                                        <div class="input-group">
-                                            <div class="custom-file">
-                                                <input type="file" name="profile_photo" class="custom-file-input @error('profile_photo') is-invalid @enderror" id="profile_photo">
-                                                <label class="custom-file-label" for="profile_photo">Choose photo</label>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    @error('profile_photo')
-                                        <div class="invalid-feedback d-block">{{ $message }}</div>
-                                    @enderror
-                                </div>
                             </div>
                         </div>
                     </div>
