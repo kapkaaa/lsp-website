@@ -108,18 +108,6 @@
                         </div>
                     </div>
                     
-                    <div class="row">
-                        <div class="col-sm-4">
-                            <strong>Profile Photo:</strong>
-                        </div>
-                        <div class="col-sm-8">
-                            @if($user->profile_photo)
-                                <img src="{{ Storage::url($user->profile_photo) }}" alt="Profile Photo" class="img-thumbnail" width="150">
-                            @else
-                                No photo
-                            @endif
-                        </div>
-                    </div>
                     
                     <div class="row">
                         <div class="col-sm-4">
