@@ -19,12 +19,13 @@ class OperationalHourController extends Controller
         return view('operationalhours.create');
     }
 
-    public function store(Request $request)
+    public function service(Request $request)
     {
         $validator = Validator::make($request->all(), [
             'day' => 'required|string|max:255',
-            'opening_time' => 'required|date_format:H:i',
-            'closing_time' => 'required|date_format:H:i|after:opening_time',
+            'open_time' => 'required|date_format:H:i',
+            'close_time' => 'required|date_format:H:i|after:opening_time',
+            'service_type' => 'required|string|max:255',
             'status' => 'required|in:open,closed'
         ]);
 
@@ -51,8 +52,9 @@ class OperationalHourController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'day' => 'required|string|max:255',
-            'opening_time' => 'required|date_format:H:i',
-            'closing_time' => 'required|date_format:H:i|after:opening_time',
+            'open_time' => 'required|date_format:H:i',
+            'close_time' => 'required|date_format:H:i|after:open_time',
+            'service_type' => 'required|string|max:255',
             'status' => 'required|in:open,closed'
         ]);
 
@@ -70,5 +72,35 @@ class OperationalHourController extends Controller
         $operationalHour->delete();
 
         return redirect()->route('operationalhours.index')->with('success', 'Operational hour deleted successfully.');
+    }
+
+    public function filter(Request $request)
+    {
+        $serviceType = $request->query('service_type');
+
+        $query = OperationalHour::query();
+        
+        if (in_array($serviceType, ['Store', 'website'])) {
+            $query->where('service_type', $serviceType);
+        }
+
+        if ($request->filled('service_type')) {
+            $query->where('service_type', $request->service_type);
+        }
+        
+        $hours = $query->get()->map(function ($hour) {
+            // Pastikan field null ditampilkan sebagai '-'
+            return [
+                'id' => $hour->id,
+                'day' => $hour->day ?? '-',
+                'open_time' => $hour->open_time ?? '-',
+                'close_time' => $hour->close_time ?? '-',
+                'status' => $hour->status ?? 'closed',
+                'created_at' => $hour->created_at,
+                // Tambahkan 'service_type' jika perlu di respons
+            ];
+        });
+
+        return response()->json($hours);
     }
 }

@@ -30,6 +30,7 @@ Route::get('/', function () {
 Route::prefix('admin')->group(function () {
     Route::get('/', [DashboardController::class, 'index'])->name('admin.dashboard');
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/operational-hours/filter', [OperationalHourController::class, 'filter'])->name('operational-hours.filter');
 
     // Master data routes
     Route::resource('brands', BrandController::class);
