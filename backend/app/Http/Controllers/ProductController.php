@@ -12,72 +12,73 @@ class ProductController extends Controller
 {
     public function index()
     {
-        $products = Product::with(['brand', 'type', 'productDetails'])->get();
+        $products = Product::with(['brand', 'type', 'details'])
+                          ->latest()
+                          ->paginate(20);
+        
         return view('products.index', compact('products'));
     }
-
+    
     public function create()
     {
         $brands = Brand::all();
         $types = Type::all();
+        
         return view('products.create', compact('brands', 'types'));
     }
-
+    
     public function store(Request $request)
     {
-        $validator = Validator::make($request->all(), [
-            'name' => 'required|string|max:255',
+        $validated = $request->validate([
             'brand_id' => 'required|exists:brands,id',
             'type_id' => 'required|exists:types,id',
-            'cost_price' => 'required|numeric|min:0',
-            'selling_price' => 'required|numeric|min:0'
+            'name' => 'required|string|max:255',
+            'selling_price' => 'required|numeric|min:0',
+            'cost_price' => 'required|numeric|min:0'
         ]);
-
-        if ($validator->fails()) {
-            return redirect()->back()->withErrors($validator)->withInput();
-        }
-
-        Product::create($request->all());
-
-        return redirect()->route('products.index')->with('success', 'Product created successfully.');
+        
+        $product = Product::create($validated);
+        
+        return redirect()->route('products.variants.index', $product)
+                        ->with('success', 'Produk berhasil dibuat. Silakan tambahkan varian.');
     }
-
-    public function show(Product $product)
-    {
-        $product->load(['brand', 'type', 'productDetails.productPhotos']);
-        return view('products.show', compact('product'));
-    }
-
+    
     public function edit(Product $product)
     {
         $brands = Brand::all();
         $types = Type::all();
+        
         return view('products.edit', compact('product', 'brands', 'types'));
     }
-
+    
     public function update(Request $request, Product $product)
     {
-        $validator = Validator::make($request->all(), [
-            'name' => 'required|string|max:255',
+        $validated = $request->validate([
             'brand_id' => 'required|exists:brands,id',
             'type_id' => 'required|exists:types,id',
-            'cost_price' => 'required|numeric|min:0',
-            'selling_price' => 'required|numeric|min:0'
+            'name' => 'required|string|max:255',
+            'selling_price' => 'required|numeric|min:0',
+            'cost_price' => 'required|numeric|min:0'
         ]);
-
-        if ($validator->fails()) {
-            return redirect()->back()->withErrors($validator)->withInput();
-        }
-
-        $product->update($request->all());
-
-        return redirect()->route('products.index')->with('success', 'Product updated successfully.');
+        
+        $product->update($validated);
+        
+        return redirect()->route('products.index')
+                        ->with('success', 'Produk berhasil diupdate.');
     }
-
+    
     public function destroy(Product $product)
     {
+        // Delete all photos first
+        foreach ($product->details as $detail) {
+            foreach ($detail->photos as $photo) {
+                $photo->delete();
+            }
+        }
+        
         $product->delete();
-
-        return redirect()->route('products.index')->with('success', 'Product deleted successfully.');
+        
+        return redirect()->route('products.index')
+                        ->with('success', 'Produk berhasil dihapus.');
     }
 }

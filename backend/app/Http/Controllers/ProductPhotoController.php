@@ -2,73 +2,47 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\ProductPhoto;
 use App\Models\ProductDetail;
+use App\Models\ProductPhoto;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
 
 class ProductPhotoController extends Controller
 {
-    public function index()
+    public function index(ProductDetail $variant)
     {
-        $productPhotos = ProductPhoto::with('productDetail')->get();
-        return view('productPhotos.index', compact('productPhotos'));
+        $photos = $variant->photos;
+        
+        return view('products.photos.index', compact('variant', 'photos'));
     }
-
-    public function create()
+    
+    public function store(Request $request, ProductDetail $variant)
     {
-        $productDetails = ProductDetail::all();
-        return view('productPhotos.create', compact('productDetails'));
-    }
-
-    public function store(Request $request)
-    {
-        $validator = Validator::make($request->all(), [
-            'product_detail_id' => 'required|exists:product_details,id',
-            'photo_url' => 'required|url|max:255'
+        $validated = $request->validate([
+            'photos' => 'required',
+            'photos.*' => 'image|mimes:jpeg,png,jpg,gif|max:2048'
         ]);
-
-        if ($validator->fails()) {
-            return redirect()->back()->withErrors($validator)->withInput();
+        
+        $uploadedFiles = [];
+        
+        foreach ($request->file('photos') as $photo) {
+            $path = $photo->store('products', 'public');
+            
+            ProductPhoto::create([
+                'product_detail_id' => $variant->id,
+                'photo_url' => $path
+            ]);
+            
+            $uploadedFiles[] = $path;
         }
-
-        ProductPhoto::create($request->all());
-
-        return redirect()->route('productPhotos.index')->with('success', 'Product photo created successfully.');
+        
+        return back()->with('success', count($uploadedFiles) . ' foto berhasil diupload.');
     }
-
-    public function show(ProductPhoto $productPhoto)
+    
+    public function destroy(ProductDetail $variant, ProductPhoto $photo)
     {
-        $productPhoto->load('productDetail');
-        return view('productPhotos.show', compact('productPhoto'));
-    }
-
-    public function edit(ProductPhoto $productPhoto)
-    {
-        $productDetails = ProductDetail::all();
-        return view('productPhotos.edit', compact('productPhoto', 'productDetails'));
-    }
-
-    public function update(Request $request, ProductPhoto $productPhoto)
-    {
-        $validator = Validator::make($request->all(), [
-            'product_detail_id' => 'required|exists:product_details,id',
-            'photo_url' => 'required|url|max:255'
-        ]);
-
-        if ($validator->fails()) {
-            return redirect()->back()->withErrors($validator)->withInput();
-        }
-
-        $productPhoto->update($request->all());
-
-        return redirect()->route('productPhotos.index')->with('success', 'Product photo updated successfully.');
-    }
-
-    public function destroy(ProductPhoto $productPhoto)
-    {
-        $productPhoto->delete();
-
-        return redirect()->route('productPhotos.index')->with('success', 'Product photo deleted successfully.');
+        
+        $photo->delete();
+        
+        return back()->with('success', 'Foto berhasil dihapus.');
     }
 }

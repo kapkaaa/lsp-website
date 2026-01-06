@@ -3,7 +3,7 @@
 @section('title', 'Operational Hours')
 
 @section('content_header')
-    <h1>Manage Operational Hours</h1>
+<h1>Manage Operational Hours</h1>
 @stop
 
 @section('content')
@@ -52,7 +52,7 @@
 @stop
 
 @section('css')
-    {{-- Tambahkan jika perlu custom CSS --}}
+{{-- Tambahkan jika perlu custom CSS --}}
 @stop
 
 @section('js')
@@ -78,23 +78,27 @@
         const serviceType = serviceTypeFilter.value;
 
         axios.get("{{ route('operational-hours.filter') }}", {
-            params: {
-                service_type: serviceType || null
-            }
-        })
-        .then(response => {
-            const data = response.data;
-            let html = '';
+                params: {
+                    service_type: serviceType || null
+                }
+            })
+            .then(response => {
+                const data = response.data;
+                let html = '';
 
-            if (data.length === 0) {
-                html = `<tr><td colspan="7" class="text-center">No operational hours found</td></tr>`;
-            } else {
-                data.forEach(hour => {
-                    const openTime = hour.open_time || '-';
-                    const closeTime = hour.close_time || '-';
-                    const createdAt = hour.created_at ? new Date(hour.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '-';
+                if (data.length === 0) {
+                    html = `<tr><td colspan="7" class="text-center">No operational hours found</td></tr>`;
+                } else {
+                    data.forEach(hour => {
+                        const openTime = hour.open_time || '-';
+                        const closeTime = hour.close_time || '-';
+                        const createdAt = hour.created_at ? new Date(hour.created_at).toLocaleDateString('en-US', {
+                            month: 'short',
+                            day: 'numeric',
+                            year: 'numeric'
+                        }) : '-';
 
-                    html += `
+                        html += `
                         <tr>
                             <td>${hour.id}</td>
                             <td>${hour.day || '-'}</td>
@@ -107,8 +111,9 @@
                             </td>
                             <td>${createdAt}</td>
                             <td>
-                                <a href="/operational-hours/${hour.id}/edit" class="btn btn-sm btn-primary">Edit</a>
-                                <form action="/operational-hours/${hour.id}" method="POST" class="d-inline">
+                                <a href="/admin/operational-hours/${hour.id}/edit" class="btn btn-sm btn-primary">Edit
+                                </a>
+                                <form action="/admin/operational-hours/${hour.id}" method="POST" class="d-inline">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure?')">Delete</button>
@@ -116,15 +121,15 @@
                             </td>
                         </tr>
                     `;
-                });
-            }
+                    });
+                }
 
-            tableBody.innerHTML = html;
-        })
-        .catch(error => {
-            console.error('Error fetching data:', error);
-            tableBody.innerHTML = `<tr><td colspan="7" class="text-center">Error loading data</td></tr>`;
-        });
+                tableBody.innerHTML = html;
+            })
+            .catch(error => {
+                console.error('Error fetching data:', error);
+                tableBody.innerHTML = `<tr><td colspan="7" class="text-center">Error loading data</td></tr>`;
+            });
     }, 300);
 
     // Load saat halaman dibuka & saat filter berubah
