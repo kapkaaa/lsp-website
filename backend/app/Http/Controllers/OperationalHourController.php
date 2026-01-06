@@ -38,11 +38,6 @@ class OperationalHourController extends Controller
         return redirect()->route('operationalhours.index')->with('success', 'Operational hour created successfully.');
     }
 
-    public function show(OperationalHour $operationalHour)
-    {
-        return view('operationalhours.show', compact('operationalHour'));
-    }
-
     public function edit(OperationalHour $operationalHour)
     {
         return view('operationalhours.edit', compact('operationalHour'));
@@ -54,7 +49,7 @@ class OperationalHourController extends Controller
             'day' => 'required|string|max:255',
             'open_time' => 'required|date_format:H:i',
             'close_time' => 'required|date_format:H:i|after:open_time',
-            'service_type' => 'required|string|max:255',
+            // 'service_type' => 'required|string|max:255',
             'status' => 'required|in:open,closed'
         ]);
 
