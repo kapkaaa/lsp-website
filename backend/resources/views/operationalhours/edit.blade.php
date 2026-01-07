@@ -24,13 +24,13 @@
                             <label for="day">Day</label>
                             <select class="form-control @error('day') is-invalid @enderror" id="day" name="day">
                                 <option value="">Select Day</option>
-                                <option value="Monday" {{ old('day', $operationalHour->day) == 'Monday' ? 'selected' : '' }}>Monday</option>
-                                <option value="Tuesday" {{ old('day', $operationalHour->day) == 'Tuesday' ? 'selected' : '' }}>Tuesday</option>
-                                <option value="Wednesday" {{ old('day', $operationalHour->day) == 'Wednesday' ? 'selected' : '' }}>Wednesday</option>
-                                <option value="Thursday" {{ old('day', $operationalHour->day) == 'Thursday' ? 'selected' : '' }}>Thursday</option>
-                                <option value="Friday" {{ old('day', $operationalHour->day) == 'Friday' ? 'selected' : '' }}>Friday</option>
-                                <option value="Saturday" {{ old('day', $operationalHour->day) == 'Saturday' ? 'selected' : '' }}>Saturday</option>
-                                <option value="Sunday" {{ old('day', $operationalHour->day) == 'Sunday' ? 'selected' : '' }}>Sunday</option>
+                                <option value="Senin" {{ old('day', $operationalHour->day) == 'Senin' ? 'selected' : '' }}>Senin</option>
+                                <option value="Selasa" {{ old('day', $operationalHour->day) == 'Selasa' ? 'selected' : '' }}>Selasa</option>
+                                <option value="Rabu" {{ old('day', $operationalHour->day) == 'Rabu' ? 'selected' : '' }}>Rabu</option>
+                                <option value="Kamis" {{ old('day', $operationalHour->day) == 'Kamis' ? 'selected' : '' }}>Kamis</option>
+                                <option value="Jumat" {{ old('day', $operationalHour->day) == 'Jumat' ? 'selected' : '' }}>Jumat</option>
+                                <option value="Sabtu" {{ old('day', $operationalHour->day) == 'Sabtu' ? 'selected' : '' }}>Sabtu</option>
+                                <option value="Minggu" {{ old('day', $operationalHour->day) == 'Minggu' ? 'selected' : '' }}>Minggu</option>
                             </select>
                             @error('day')
                                 <div class="invalid-feedback">{{ $message }}</div>
@@ -86,5 +86,4 @@
 @stop
 
 @section('js')
-    <script> console.log("Hi, I am here") </script>
 @stop
