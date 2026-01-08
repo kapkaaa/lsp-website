@@ -3,36 +3,54 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 
+// ============ Product Model ============
 class Product extends Model
 {
     protected $fillable = [
         'brand_id',
         'type_id',
         'name',
-        'cost_price',
-        'selling_price'
+        'selling_price',
+        'cost_price'
     ];
 
     protected $casts = [
-        'cost_price' => 'decimal:2',
-        'selling_price' => 'decimal:2',
+        'selling_price' => 'integer',
+        'cost_price' => 'integer'
     ];
 
-    public function brand(): BelongsTo
+    // Relationships
+    public function brand()
     {
         return $this->belongsTo(Brand::class);
     }
 
-    public function type(): BelongsTo
+    public function type()
     {
         return $this->belongsTo(Type::class);
     }
 
-    public function productDetails(): HasMany
+    public function productDetails()
     {
         return $this->hasMany(ProductDetail::class, 'product_id');
+    }
+
+    public function orderDetails()
+    {
+        return $this->hasMany(OrderDetail::class);
+    }
+
+    // Helper Methods
+    public function getTotalStock()
+    {
+        return $this->productDetails()->sum('stock');
+    }
+
+    public function getAvailableStock()
+    {
+        return $this->productDetails()
+            ->where('status', 'available')
+            ->sum('stock');
     }
 }
