@@ -1,5 +1,8 @@
+<?php
+
 namespace App\Models;
 
+use App\Models\ProductDetail;
 use Illuminate\Database\Eloquent\Model;
 
 class Color extends Model
