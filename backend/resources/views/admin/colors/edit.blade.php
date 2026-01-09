@@ -66,7 +66,7 @@
                     <h3 class="card-title">Color Statistics</h3>
                 </div>
                 <div class="card-body">
-                    <p><strong>Products:</strong> {{ $color->productDetails()->count() }}</p>
+                    <p><strong>Variant:</strong> {{ $color->productDetails()->count() }}</p>
                     <p><strong>Created:</strong> {{ $color->created_at->format('d M Y H:i') }}</p>
                     <p><strong>Last Updated:</strong> {{ $color->updated_at->format('d M Y H:i') }}</p>
                 </div>
