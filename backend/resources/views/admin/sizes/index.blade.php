@@ -1,0 +1,94 @@
+@extends('layouts.admin')
+
+@section('page_title', 'Sizes')
+
+@section('breadcrumb')
+    <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Dashboard</a></li>
+    <li class="breadcrumb-item active">Sizes</li>
+@endsection
+
+@section('main_content')
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Size List</h3>
+                    <div class="card-tools">
+                        <a href="{{ route('admin.sizes.create') }}" class="btn btn-primary btn-sm">
+                            <i class="fas fa-plus"></i> Add New Size
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <table id="sizesTable" class="table table-bordered table-striped">
+                        <thead>
+                            <tr>
+                                <th width="5%">No</th>
+                                <th>Name</th>
+                                <th>Information</th>
+                                <th>Total Products</th>
+                                <th>Created At</th>
+                                <th width="15%">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($sizes as $index => $size)
+                                <tr>
+                                    <td>{{ $sizes->firstItem() + $index }}</td>
+                                    <td>{{ $size->name }}</td>
+                                    <td>{{ $size->information ?? '-' }}</td>
+                                    <td>
+                                        <span class="badge badge-info">{{ $size->product_details_count }} variants</span>
+                                    </td>
+                                    <td>{{ $size->created_at->format('d M Y') }}</td>
+                                    <td>
+                                        <div class="btn-group">
+                                            <a href="{{ route('admin.sizes.edit', $size->id) }}" 
+                                               class="btn btn-sm btn-warning" title="Edit">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <form id="delete-form-{{ $size->id }}" 
+                                                  action="{{ route('admin.sizes.destroy', $size->id) }}" 
+                                                  method="POST" style="display: inline;">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="button" 
+                                                        class="btn btn-sm btn-danger" 
+                                                        onclick="confirmDelete('delete-form-{{ $size->id }}')" 
+                                                        title="Delete">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+                <div class="card-footer clearfix">
+                    {{ $sizes->links('pagination::bootstrap-4') }}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@endsection
+
+@push('js')
+<script>
+$(document).ready(function() {
+    $('#sizesTable').DataTable().destroy();
+    $('#sizesTable').DataTable({
+        "paging": false,
+        "lengthChange": false,
+        "searching": true,
+        "ordering": true,
+        "info": false,
+        "autoWidth": false,
+        "responsive": true,
+    });
+});
+</script>
+@endpush
