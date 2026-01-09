@@ -79,7 +79,7 @@
 @push('js')
 <script>
 $(document).ready(function() {
-    $('#typesTable').Destroy();
+    $('#typesTable').DataTable().destroy();
     $('#typesTable').DataTable({
         "paging": false,
         "lengthChange": false,
