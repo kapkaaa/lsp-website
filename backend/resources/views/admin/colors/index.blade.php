@@ -3,8 +3,8 @@
 @section('page_title', 'Colors')
 
 @section('breadcrumb')
-<li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Dashboard</a></li>
-<li class="breadcrumb-item active">Colors</li>
+    <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Dashboard</a></li>
+    <li class="breadcrumb-item active">Colors</li>
 @endsection
 
 @section('main_content')
@@ -33,43 +33,45 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach($colors as $index => $color)
-                            <tr>
-                                <td>{{ $colors->firstItem() + $index }}</td>
-                                <td>{{ $color->name }}</td>
-                                <td>{{ $color->information ?? '-' }}</td>
-                                <td>
-                                    <span class="badge badge-info">{{ $color->product_details_count }} variant</span>
-                                </td>
-                                <td>{{ $color->created_at->format('d M Y') }}</td>
-                                <td>
-                                    <div class="btn-group">
-                                        <a href="{{ route('admin.colors.edit', $color->id) }}"
-                                            class="btn btn-sm btn-warning" title="Edit">
-                                            <i class="fas fa-edit"></i>
-                                        </a>
-                                        <form id="delete-form-{{ $color->id }}"
-                                            action="{{ route('admin.colors.destroy', $color->id) }}"
-                                            method="POST" style="display: inline;">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="button"
-                                                class="btn btn-sm btn-danger"
-                                                onclick="confirmDelete('delete-form-{{ $color->id }}')"
-                                                title="Delete">
-                                                <i class="fas fa-trash"></i>
-                                            </button>
-                                        </form>
-                                    </div>
-                                </td>
-                            </tr>
-                            @endforeach
+                            @forelse($colors as $index => $color)
+                                <tr>
+                                    <td>{{ $loop->iteration }}</td>
+                                    <td>{{ $color->name }}</td>
+                                    <td>{{ $color->information ?? '-' }}</td>
+                                    <td>
+                                        <span class="badge badge-info">{{ $color->product_details_count }} variants</span>
+                                    </td>
+                                    <td>{{ $color->created_at->format('d M Y') }}</td>
+                                    <td>
+                                        <div class="btn-group">
+                                            <a href="{{ route('admin.colors.edit', $color->id) }}" 
+                                               class="btn btn-sm btn-warning" title="Edit">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <form id="delete-form-{{ $color->id }}" 
+                                                  action="{{ route('admin.colors.destroy', $color->id) }}" 
+                                                  method="POST" style="display: inline;">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="button" 
+                                                        class="btn btn-sm btn-danger" 
+                                                        onclick="confirmDelete('delete-form-{{ $color->id }}')" 
+                                                        title="Delete">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="6" class="text-center text-muted">No colors found</td>
+                                </tr>
+                            @endforelse
                         </tbody>
                     </table>
                 </div>
-                <div class="card-footer clearfix">
-                    {{ $colors->links('pagination::bootstrap-4') }}
-                </div>
+                {{-- Pagination Laravel dihapus karena DataTables menangani paging --}}
             </div>
         </div>
     </div>
@@ -78,17 +80,26 @@
 
 @push('js')
 <script>
-    $(document).ready(function() {
+$(document).ready(function() {
+    // Hancurkan instance DataTable sebelumnya jika ada
+    if ($.fn.DataTable.isDataTable('#colorsTable')) {
         $('#colorsTable').DataTable().destroy();
-        $('#colorsTable').DataTable({
-            "paging": false,
-            "lengthChange": false,
-            "searching": true,
-            "ordering": true,
-            "info": false,
-            "autoWidth": false,
-            "responsive": true,
-        });
+    }
+
+    $('#colorsTable').DataTable({
+        "paging": true,
+        "lengthChange": true,
+        "searching": true,
+        "ordering": true,
+        "info": true,
+        "autoWidth": false,
+        "responsive": true,
+        "pageLength": 25,
+        "columnDefs": [
+            { "orderable": false, "targets": [0, 5] },   // No & Action tidak bisa di-sort
+            { "searchable": false, "targets": [0, 3, 4, 5] } // Kolom tertentu tidak ikut search
+        ]
     });
+});
 </script>
 @endpush

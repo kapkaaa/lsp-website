@@ -33,13 +33,13 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach($brands as $index => $brand)
+                            @forelse($brands as $index => $brand)
                                 <tr>
-                                    <td>{{ $brands->firstItem() + $index }}</td>
+                                    <td>{{ $loop->iteration }}</td>
                                     <td>{{ $brand->name }}</td>
                                     <td>{{ $brand->information ?? '-' }}</td>
                                     <td>
-                                        <span class="badge badge-info">{{ $brand->products_count }} products</span>
+                                        <span class="badge badge-info">{{ $brand->product_details_count }} variants</span>
                                     </td>
                                     <td>{{ $brand->created_at->format('d M Y') }}</td>
                                     <td>
@@ -63,13 +63,15 @@
                                         </div>
                                     </td>
                                 </tr>
-                            @endforeach
+                            @empty
+                                <tr>
+                                    <td colspan="6" class="text-center text-muted">No brands found</td>
+                                </tr>
+                            @endforelse
                         </tbody>
                     </table>
                 </div>
-                <div class="card-footer clearfix">
-                    {{ $brands->links('pagination::bootstrap-4') }}
-                </div>
+                {{-- Pagination Laravel dihapus karena DataTables menangani paging --}}
             </div>
         </div>
     </div>
@@ -79,15 +81,24 @@
 @push('js')
 <script>
 $(document).ready(function() {
-    $('#brandsTable').DataTable().destroy();
+    // Hancurkan instance DataTable sebelumnya jika ada
+    if ($.fn.DataTable.isDataTable('#brandsTable')) {
+        $('#brandsTable').DataTable().destroy();
+    }
+
     $('#brandsTable').DataTable({
-        "paging": false,
-        "lengthChange": false,
+        "paging": true,
+        "lengthChange": true,
         "searching": true,
         "ordering": true,
-        "info": false,
+        "info": true,
         "autoWidth": false,
         "responsive": true,
+        "pageLength": 25,
+        "columnDefs": [
+            { "orderable": false, "targets": [0, 5] },   // No & Action tidak bisa di-sort
+            { "searchable": false, "targets": [0, 3, 4, 5] } // Kolom tertentu tidak ikut search
+        ]
     });
 });
 </script>
