@@ -244,6 +244,23 @@ class ProductController extends Controller
         return $barcode;
     }
 
+    public function liveSearch(Request $request)
+    {
+        $query = $request->get('q', '');
+
+        $products = Product::with(['brand', 'type', 'productDetails.photos'])
+            ->when($query, function ($builder, $search) {
+                $builder->where(function ($q) use ($search) {
+                    $q->where('name', 'LIKE', "%{$search}%")
+                        ->orWhereHas('brand', fn($b) => $b->where('name', 'LIKE', "%{$search}%"))
+                        ->orWhereHas('type', fn($t) => $t->where('name', 'LIKE', "%{$search}%"));
+                });
+            })
+            ->paginate(15); // Sesuaikan jumlah per halaman
+
+        return view('admin.products.partials.product_table', compact('products'));
+    }
+
     // API endpoints for POS
     public function searchByBarcode(Request $request)
     {
