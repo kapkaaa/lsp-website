@@ -33,9 +33,9 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach($sizes as $index => $size)
+                            @forelse($sizes as $index => $size)
                                 <tr>
-                                    <td>{{ $sizes->firstItem() + $index }}</td>
+                                    <td>{{ $loop->iteration }}</td>
                                     <td>{{ $size->name }}</td>
                                     <td>{{ $size->information ?? '-' }}</td>
                                     <td>
@@ -63,13 +63,15 @@
                                         </div>
                                     </td>
                                 </tr>
-                            @endforeach
+                            @empty
+                                <tr>
+                                    <td colspan="6" class="text-center text-muted">No sizes found</td>
+                                </tr>
+                            @endforelse
                         </tbody>
                     </table>
                 </div>
-                <div class="card-footer clearfix">
-                    {{ $sizes->links('pagination::bootstrap-4') }}
-                </div>
+                {{-- Pagination Laravel dihapus karena DataTables menangani paging --}}
             </div>
         </div>
     </div>
@@ -79,15 +81,24 @@
 @push('js')
 <script>
 $(document).ready(function() {
-    $('#sizesTable').DataTable().destroy();
+    // Hancurkan instance DataTable sebelumnya jika ada
+    if ($.fn.DataTable.isDataTable('#sizesTable')) {
+        $('#sizesTable').DataTable().destroy();
+    }
+
     $('#sizesTable').DataTable({
-        "paging": false,
-        "lengthChange": false,
+        "paging": true,
+        "lengthChange": true,
         "searching": true,
         "ordering": true,
-        "info": false,
+        "info": true,
         "autoWidth": false,
         "responsive": true,
+        "pageLength": 25,
+        "columnDefs": [
+            { "orderable": false, "targets": [0, 5] },   // No & Action tidak bisa di-sort
+            { "searchable": false, "targets": [0, 3, 4, 5] } // Kolom tertentu tidak ikut search
+        ]
     });
 });
 </script>
