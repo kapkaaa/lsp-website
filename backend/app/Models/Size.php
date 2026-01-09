@@ -1,8 +1,11 @@
+<?php
+
 namespace App\Models;
 
+use App\Models\ProductDetail;
 use Illuminate\Database\Eloquent\Model;
 
-class Size extends Model
+class size extends Model
 {
     protected $fillable = ['name', 'information'];
     
