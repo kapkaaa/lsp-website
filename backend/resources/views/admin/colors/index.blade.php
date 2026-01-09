@@ -39,7 +39,7 @@
                                 <td>{{ $color->name }}</td>
                                 <td>{{ $color->information ?? '-' }}</td>
                                 <td>
-                                    <span class="badge badge-info">{{ $color->products_count }} products</span>
+                                    <span class="badge badge-info">{{ $color->product_details_count }} variant</span>
                                 </td>
                                 <td>{{ $color->created_at->format('d M Y') }}</td>
                                 <td>
