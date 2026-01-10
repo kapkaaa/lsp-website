@@ -30,7 +30,15 @@ use App\Http\Controllers\Customer\ChatController;
 
 // Home redirect
 Route::get('/', function () {
-    return redirect()->route('customer.home');
+    if (auth()->check()) {
+        $user = auth()->user();
+        if ($user->isAdmin()) {
+            return redirect()->route('admin.dashboard');
+        } elseif ($user->isKasir()) {
+            return redirect()->route('admin.dashboard'); // Kasir juga ke admin
+        }
+    }
+    return redirect()->route('login');
 });
 
 // ==================== Authentication Routes ====================
@@ -95,21 +103,17 @@ Route::middleware(['auth', 'role:Admin'])->prefix('admin')->name('admin.')->grou
     // Dashboard
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     
-    // Master Data - Brands
+    // Master Data
     Route::resource('brands', BrandController::class);
-    
-    // Master Data - Types
     Route::resource('types', TypeController::class);
-    
-    // Master Data - Colors
     Route::resource('colors', ColorController::class);
-    
-    // Master Data - Sizes
     Route::resource('sizes', SizeController::class);
     
     // Products
     Route::resource('products', AdminProductController::class);
     Route::get('/products/search/barcode', [AdminProductController::class, 'searchByBarcode'])->name('products.search.barcode');
+    Route::get('/products/live-search', [AdminProductController::class, 'liveSearch'])
+    ->name('products.live-search');
     
     // Users
     Route::resource('users', UserController::class);
