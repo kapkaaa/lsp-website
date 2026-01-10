@@ -5,27 +5,83 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Carbon\Carbon;
 
+// ============ OperationalHour Model ============
 class OperationalHour extends Model
 {
     protected $fillable = [
-        'service_type', 'day', 'open_time', 
-        'close_time', 'status'
+        'service_type',
+        'day',
+        'open_time',
+        'close_time',
+        'status'
     ];
-    
-    // Check if currently operational
-    public static function isOperational($serviceType = 'store')
+
+    protected $casts = [
+        'open_time' => 'datetime:H:i:s',
+        'close_time' => 'datetime:H:i:s'
+    ];
+
+    // Helper Methods
+    public static function isOperational($serviceType = 'Website')
     {
-        $today = strtolower(Carbon::now()->format('l')); // monday, tuesday, etc
-        
-        $hour = self::where('service_type', $serviceType)
-                    ->where('day', $today)
-                    ->first();
-        
-        if (!$hour || $hour->status !== 'open') {
+        $currentDay = Carbon::now()->format('l'); // Monday, Tuesday, etc
+        $currentTime = Carbon::now()->format('H:i:s');
+
+        $operationalHour = self::where('service_type', $serviceType)
+            ->where('day', $currentDay)
+            ->where('status', 'open')
+            ->first();
+
+        if (!$operationalHour) {
             return false;
         }
+
+        $openTime = Carbon::parse($operationalHour->open_time)->format('H:i:s');
+        $closeTime = Carbon::parse($operationalHour->close_time)->format('H:i:s');
+
+        return $currentTime >= $openTime && $currentTime <= $closeTime;
+    }
+
+    public static function getOperationalMessage($serviceType = 'online')
+    {
+        $currentDay = Carbon::now()->format('l');
         
-        $now = Carbon::now()->format('H:i:s');
-        return $now >= $hour->open_time && $now <= $hour->close_time;
+        $operationalHour = self::where('service_type', $serviceType)
+            ->where('day', $currentDay)
+            ->first();
+
+        if (!$operationalHour || $operationalHour->status === 'closed') {
+            return 'Layanan tutup hari ini';
+        }
+
+        if (self::isOperational($serviceType)) {
+            return 'Layanan buka: ' . 
+                   Carbon::parse($operationalHour->open_time)->format('H:i') . ' - ' . 
+                   Carbon::parse($operationalHour->close_time)->format('H:i');
+        }
+
+        return 'Layanan tutup. Buka jam: ' . 
+               Carbon::parse($operationalHour->open_time)->format('H:i') . ' - ' . 
+               Carbon::parse($operationalHour->close_time)->format('H:i');
+    }
+
+    public static function getTodayOperationalHours($serviceType = 'online')
+    {
+        $currentDay = Carbon::now()->format('l');
+        
+        return self::where('service_type', $serviceType)
+            ->where('day', $currentDay)
+            ->first();
+    }
+
+    public function isCurrentlyOpen()
+    {
+        $currentTime = Carbon::now()->format('H:i:s');
+        $openTime = Carbon::parse($this->open_time)->format('H:i:s');
+        $closeTime = Carbon::parse($this->close_time)->format('H:i:s');
+
+        return $this->status === 'open' && 
+               $currentTime >= $openTime && 
+               $currentTime <= $closeTime;
     }
 }
