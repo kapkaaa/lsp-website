@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 
 // ============ OperationalHour Model ============
 class OperationalHour extends Model
@@ -31,6 +32,9 @@ class OperationalHour extends Model
             ->where('day', $currentDay)
             ->where('status', 'open')
             ->first();
+            // db::listen(function ($operationalHour) {
+            //     dd($operationalHour->sql, $operationalHour->bindings);
+            // });
 
         if (!$operationalHour) {
             return false;
@@ -42,13 +46,16 @@ class OperationalHour extends Model
         return $currentTime >= $openTime && $currentTime <= $closeTime;
     }
 
-    public static function getOperationalMessage($serviceType = 'online')
+    public static function getOperationalMessage($serviceType = 'Website')
     {
         $currentDay = Carbon::now()->format('l');
         
         $operationalHour = self::where('service_type', $serviceType)
             ->where('day', $currentDay)
             ->first();
+        // DB::listen(function ($operationalHour) {
+        //     dd($operationalHour->sql, $operationalHour->bindings);
+        // });
 
         if (!$operationalHour || $operationalHour->status === 'closed') {
             return 'Layanan tutup hari ini';
@@ -65,7 +72,7 @@ class OperationalHour extends Model
                Carbon::parse($operationalHour->close_time)->format('H:i');
     }
 
-    public static function getTodayOperationalHours($serviceType = 'online')
+    public static function getTodayOperationalHours($serviceType = 'Website')
     {
         $currentDay = Carbon::now()->format('l');
         
