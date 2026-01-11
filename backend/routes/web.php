@@ -124,6 +124,10 @@ Route::middleware(['auth', 'role:Admin'])->prefix('admin')->name('admin.')->grou
     // Operational Hours
     Route::prefix('operational-hours')->name('operational-hours.')->group(function () {
         Route::get('/', [OperationalHourController::class, 'index'])->name('index');
+        Route::get(
+            'operational-hours/filter',
+            [OperationalHourController::class, 'filter']
+        )->name('operational-hours.filter');
         Route::get('/{operationalHour}/edit', [OperationalHourController::class, 'edit'])->name('edit');
         Route::put('/{operationalHour}', [OperationalHourController::class, 'update'])->name('update');
         Route::post('/bulk-update', [OperationalHourController::class, 'bulkUpdate'])->name('bulk-update');
