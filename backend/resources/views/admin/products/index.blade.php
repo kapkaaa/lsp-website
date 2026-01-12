@@ -74,26 +74,10 @@
                                 </td>
                                 <td>
                                     <div class="btn-group">
-                                        <a href="{{ route('admin.products.show', $product->id) }}"
-                                            class="btn btn-sm btn-info" title="View">
-                                            <i class="fas fa-eye"></i>
-                                        </a>
                                         <a href="{{ route('admin.products.edit', $product->id) }}"
-                                            class="btn btn-sm btn-warning" title="Edit">
-                                            <i class="fas fa-edit"></i>
+                                            class="btn btn-sm btn-info" title="Edit">
+                                            <i class="fas fa-edit"> Detail</i>
                                         </a>
-                                        <form id="delete-form-{{ $product->id }}"
-                                            action="{{ route('admin.products.destroy', $product->id) }}"
-                                            method="POST" style="display: inline;">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="button"
-                                                class="btn btn-sm btn-danger"
-                                                onclick="confirmDelete('delete-form-{{ $product->id }}')"
-                                                title="Delete">
-                                                <i class="fas fa-trash"></i>
-                                            </button>
-                                        </form>
                                     </div>
                                 </td>
                             </tr>
