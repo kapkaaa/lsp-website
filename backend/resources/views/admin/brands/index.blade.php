@@ -39,27 +39,16 @@
                                     <td>{{ $brand->name }}</td>
                                     <td>{{ $brand->information ?? '-' }}</td>
                                     <td>
-                                        <span class="badge badge-info">{{ $brand->product_details_count }} variants</span>
+                                        <span class="badge badge-info">{{ $brand->products_count }} Product</span>
                                     </td>
                                     <td>{{ $brand->created_at->format('d M Y') }}</td>
                                     <td>
                                         <div class="btn-group">
                                             <a href="{{ route('admin.brands.edit', $brand->id) }}" 
-                                               class="btn btn-sm btn-warning" title="Edit">
-                                                <i class="fas fa-edit"></i>
+                                               class="btn btn-sm btn-info" title="Edit">
+                                                <i class="fas fa-edit"> Detail</i>
+
                                             </a>
-                                            <form id="delete-form-{{ $brand->id }}" 
-                                                  action="{{ route('admin.brands.destroy', $brand->id) }}" 
-                                                  method="POST" style="display: inline;">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="button" 
-                                                        class="btn btn-sm btn-danger" 
-                                                        onclick="confirmDelete('delete-form-{{ $brand->id }}')" 
-                                                        title="Delete">
-                                                    <i class="fas fa-trash"></i>
-                                                </button>
-                                            </form>
                                         </div>
                                     </td>
                                 </tr>
