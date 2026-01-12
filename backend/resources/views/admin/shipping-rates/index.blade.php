@@ -16,11 +16,6 @@
                     <h3 class="card-title">
                         <i class="fas fa-truck"></i> Shipping Rates Management
                     </h3>
-                    <div class="card-tools">
-                        <a href="{{ route('admin.shipping-rates.create') }}" class="btn btn-primary btn-sm">
-                            <i class="fas fa-plus"></i> Add New Rate
-                        </a>
-                    </div>
                 </div>
                 <div class="card-body">
                     <div class="table-responsive">
@@ -33,7 +28,6 @@
                                     <th>Example (3 kaos)</th>
                                     <th>Total Orders</th>
                                     <th>Created At</th>
-                                    <th width="15%">Action</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -61,36 +55,6 @@
                                             </span>
                                         </td>
                                         <td>{{ $rate->created_at->format('d M Y') }}</td>
-                                        <td>
-                                            <div class="btn-group">
-                                                <a href="{{ route('admin.shipping-rates.edit', $rate->id) }}" 
-                                                   class="btn btn-sm btn-warning" 
-                                                   title="Edit">
-                                                    <i class="fas fa-edit"></i>
-                                                </a>
-                                                @if($rate->orders->count() == 0)
-                                                    <form id="delete-form-{{ $rate->id }}" 
-                                                          action="{{ route('admin.shipping-rates.destroy', $rate->id) }}" 
-                                                          method="POST" 
-                                                          style="display: inline;">
-                                                        @csrf
-                                                        @method('DELETE')
-                                                        <button type="button" 
-                                                                class="btn btn-sm btn-danger" 
-                                                                onclick="confirmDelete('delete-form-{{ $rate->id }}')" 
-                                                                title="Delete">
-                                                            <i class="fas fa-trash"></i>
-                                                        </button>
-                                                    </form>
-                                                @else
-                                                    <button class="btn btn-sm btn-secondary" 
-                                                            disabled 
-                                                            title="Cannot delete - has orders">
-                                                        <i class="fas fa-trash"></i>
-                                                    </button>
-                                                @endif
-                                            </div>
-                                        </td>
                                     </tr>
                                 @endforeach
                             </tbody>
