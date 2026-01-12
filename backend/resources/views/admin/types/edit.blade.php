@@ -80,10 +80,14 @@
                     <a href="{{ route('admin.types.index') }}" class="btn btn-secondary btn-block">
                         <i class="fas fa-list"></i> All Types
                     </a>
-                    <form action="{{ route('admin.types.destroy', $type->id) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this type?')">
+                    <form action="{{ route('admin.types.destroy', $type->id) }}" method="POST" id="delete-form-{{ $type->id }}">
                         @csrf
                         @method('DELETE')
-                        <button type="submit" class="btn btn-danger btn-block mt-2">
+
+                        <button
+                            type="button"
+                            class="btn btn-danger btn-block mt-2"
+                            onclick="confirmDelete('delete-form-{{ $type->id }}')">
                             <i class="fas fa-trash"></i> Delete Type
                         </button>
                     </form>
