@@ -80,10 +80,14 @@
                     <a href="{{ route('admin.sizes.index') }}" class="btn btn-secondary btn-block">
                         <i class="fas fa-list"></i> All Sizes
                     </a>
-                    <form action="{{ route('admin.sizes.destroy', $size->id) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this size?')">
+                    <form action="{{ route('admin.sizes.destroy', $size->id) }}" method="POST" id="delete-form-{{ $size->id }}">
                         @csrf
                         @method('DELETE')
-                        <button type="submit" class="btn btn-danger btn-block mt-2">
+
+                        <button
+                            type="button"
+                            class="btn btn-danger btn-block mt-2"
+                            onclick="confirmDelete('delete-form-{{ $size->id }}')">
                             <i class="fas fa-trash"></i> Delete Size
                         </button>
                     </form>
