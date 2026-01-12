@@ -3,9 +3,9 @@
 @section('page_title', 'Edit Color')
 
 @section('breadcrumb')
-    <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Dashboard</a></li>
-    <li class="breadcrumb-item"><a href="{{ route('admin.colors.index') }}">Colors</a></li>
-    <li class="breadcrumb-item active">Edit</li>
+<li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Dashboard</a></li>
+<li class="breadcrumb-item"><a href="{{ route('admin.colors.index') }}">Colors</a></li>
+<li class="breadcrumb-item active">Edit</li>
 @endsection
 
 @section('main_content')
@@ -14,7 +14,7 @@
         <div class="col-md-6">
             <!-- Form edit color -->
             <div class="card">
-            <div class="card-header bg-primary text-white">
+                <div class="card-header bg-primary text-white">
                     <h3 class="card-title">Edit Color Information</h3>
                 </div>
                 <form action="{{ route('admin.colors.update', $color->id) }}" method="POST">
@@ -23,27 +23,27 @@
                     <div class="card-body">
                         <div class="form-group">
                             <label for="name">Color Name <span class="text-danger">*</span></label>
-                            <input type="text" 
-                                   class="form-control @error('name') is-invalid @enderror" 
-                                   id="name" 
-                                   name="name" 
-                                   value="{{ old('name', $color->name) }}" 
-                                   placeholder="Enter color name" 
-                                   required>
+                            <input type="text"
+                                class="form-control @error('name') is-invalid @enderror"
+                                id="name"
+                                name="name"
+                                value="{{ old('name', $color->name) }}"
+                                placeholder="Enter color name"
+                                required>
                             @error('name')
-                                <span class="invalid-feedback">{{ $message }}</span>
+                            <span class="invalid-feedback">{{ $message }}</span>
                             @enderror
                         </div>
 
                         <div class="form-group">
                             <label for="information">Information</label>
-                            <textarea class="form-control @error('information') is-invalid @enderror" 
-                                      id="information" 
-                                      name="information" 
-                                      rows="3" 
-                                      placeholder="Enter color information">{{ old('information', $color->information) }}</textarea>
+                            <textarea class="form-control @error('information') is-invalid @enderror"
+                                id="information"
+                                name="information"
+                                rows="3"
+                                placeholder="Enter color information">{{ old('information', $color->information) }}</textarea>
                             @error('information')
-                                <span class="invalid-feedback">{{ $message }}</span>
+                            <span class="invalid-feedback">{{ $message }}</span>
                             @enderror
                         </div>
                     </div>
@@ -80,10 +80,14 @@
                     <a href="{{ route('admin.colors.index') }}" class="btn btn-secondary btn-block">
                         <i class="fas fa-list"></i> All Colors
                     </a>
-                    <form action="{{ route('admin.colors.destroy', $color->id) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this color?')">
+                    <form action="{{ route('admin.colors.destroy', $color->id) }}" method="POST" id="delete-form-{{ $color->id }}">
                         @csrf
                         @method('DELETE')
-                        <button type="submit" class="btn btn-danger btn-block mt-2">
+
+                        <button
+                            type="button"
+                            class="btn btn-danger btn-block mt-2"
+                            onclick="confirmDelete('delete-form-{{ $color->id }}')">
                             <i class="fas fa-trash"></i> Delete Color
                         </button>
                     </form>
