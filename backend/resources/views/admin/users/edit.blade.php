@@ -175,11 +175,15 @@
 
                     <!-- Tombol Hapus -->
                     @if($user->id != auth()->id())
-                    <form action="{{ route('admin.users.destroy', $user->id) }}" method="POST" onsubmit="return confirm('Yakin hapus user ini? Data tidak bisa dikembalikan!')">
+                    <form action="{{ route('admin.users.destroy', $user->id) }}" method="POST" id="delete-form-{{ $user->id }}">
                         @csrf
                         @method('DELETE')
-                        <button type="submit" class="btn btn-danger btn-block">
-                            <i class="fas fa-trash"></i> Hapus User
+
+                        <button
+                            type="button"
+                            class="btn btn-danger btn-block mt-2"
+                            onclick="confirmDelete('delete-form-{{ $user->id }}')">
+                            <i class="fas fa-trash"></i> Delete User
                         </button>
                     </form>
                     @endif
@@ -195,7 +199,23 @@
 @stop
 
 @section('js')
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
-    console.log('Halaman Edit User dimuat.');
+    function confirmDelete(formId) {
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "You won't be able to revert this!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Yes, delete it!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                document.getElementById(formId).submit();
+            }
+        });
+    }
+</script>
 </script>
 @stop
