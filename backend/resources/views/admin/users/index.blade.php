@@ -55,18 +55,9 @@
                                     <td>{{ $user->created_at->format('d M Y') }}</td>
                                     <td>
                                         <div class="btn-group">
-                                            <a href="{{ route('admin.users.edit', $user->id) }}" class="btn btn-sm btn-warning" title="Edit">
-                                                <i class="fas fa-edit"></i>
+                                            <a href="{{ route('admin.users.edit', $user->id) }}" class="btn btn-sm btn-info" title="Edit">
+                                                <i class="fas fa-edit"> Detail</i>
                                             </a>
-                                            @if($user->id != auth()->id())
-                                                <form id="delete-form-{{ $user->id }}" action="{{ route('admin.users.destroy', $user->id) }}" method="POST" style="display: inline;">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button type="button" class="btn btn-sm btn-danger" onclick="confirmDelete('delete-form-{{ $user->id }}')" title="Delete">
-                                                        <i class="fas fa-trash"></i>
-                                                    </button>
-                                                </form>
-                                            @endif
                                         </div>
                                     </td>
                                 </tr>
