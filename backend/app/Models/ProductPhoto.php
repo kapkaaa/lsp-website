@@ -12,8 +12,16 @@ class ProductPhoto extends Model
         'photo_url'
     ];
 
-    public function productDetail(): BelongsTo
+    public function productDetail()
     {
-        return $this->belongsTo(ProductDetail::class, 'product_detail_id');
+        return $this->belongsTo(ProductDetail::class);
+    }
+
+    public function getPhotoUrlAttribute($value)
+    {
+        if ($value && !str_starts_with($value, 'http')) {
+            return asset('storage/' . $value);
+        }
+        return $value;
     }
 }
