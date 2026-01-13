@@ -23,13 +23,13 @@
                             <select class="form-control @error('brand_id') is-invalid @enderror" id="brand_id" name="brand_id" required>
                                 <option value="">Select Brand</option>
                                 @foreach($brands as $brand)
-                                    <option value="{{ $brand->id }}" {{ (old('brand_id') ?? $product->brand_id) == $brand->id ? 'selected' : '' }}>
-                                        {{ $brand->name }}
-                                    </option>
+                                <option value="{{ $brand->id }}" {{ (old('brand_id') ?? $product->brand_id) == $brand->id ? 'selected' : '' }}>
+                                    {{ $brand->name }}
+                                </option>
                                 @endforeach
                             </select>
                             @error('brand_id')
-                                <span class="invalid-feedback">{{ $message }}</span>
+                            <span class="invalid-feedback">{{ $message }}</span>
                             @enderror
                         </div>
 
@@ -39,13 +39,13 @@
                             <select class="form-control @error('type_id') is-invalid @enderror" id="type_id" name="type_id" required>
                                 <option value="">Select Type</option>
                                 @foreach($types as $type)
-                                    <option value="{{ $type->id }}" {{ (old('type_id') ?? $product->type_id) == $type->id ? 'selected' : '' }}>
-                                        {{ $type->name }}
-                                    </option>
+                                <option value="{{ $type->id }}" {{ (old('type_id') ?? $product->type_id) == $type->id ? 'selected' : '' }}>
+                                    {{ $type->name }}
+                                </option>
                                 @endforeach
                             </select>
                             @error('type_id')
-                                <span class="invalid-feedback">{{ $message }}</span>
+                            <span class="invalid-feedback">{{ $message }}</span>
                             @enderror
                         </div>
 
@@ -60,7 +60,7 @@
                                 placeholder="Enter product name"
                                 required>
                             @error('name')
-                                <span class="invalid-feedback">{{ $message }}</span>
+                            <span class="invalid-feedback">{{ $message }}</span>
                             @enderror
                         </div>
 
@@ -77,7 +77,7 @@
                                         placeholder="0"
                                         required>
                                     @error('cost_price')
-                                        <span class="invalid-feedback">{{ $message }}</span>
+                                    <span class="invalid-feedback">{{ $message }}</span>
                                     @enderror
                                 </div>
                             </div>
@@ -92,7 +92,7 @@
                                         placeholder="0"
                                         required>
                                     @error('selling_price')
-                                        <span class="invalid-feedback">{{ $message }}</span>
+                                    <span class="invalid-feedback">{{ $message }}</span>
                                     @enderror
                                 </div>
                             </div>
@@ -103,50 +103,50 @@
                             <h5><strong>Product Variants</strong></h5>
                             <div id="variantsContainer">
                                 @if($product->productDetails->count() > 0)
-                                    @foreach($product->productDetails as $index => $variant)
-                                        <div class="variant-item mb-3 p-3 border rounded bg-white">
-                                            <input type="hidden" name="variants[{{ $index }}][id]" value="{{ $variant->id }}">
-                                            <div class="row">
-                                                <div class="col-md-3">
-                                                    <label>Size *</label>
-                                                    <select class="form-control" name="variants[{{ $index }}][size_id]" required>
-                                                        <option value="">Select Size</option>
-                                                        @foreach($sizes as $size)
-                                                            <option value="{{ $size->id }}" {{ $variant->size_id == $size->id ? 'selected' : '' }}>
-                                                                {{ $size->name }}
-                                                            </option>
-                                                        @endforeach
-                                                    </select>
-                                                </div>
-                                                <div class="col-md-3">
-                                                    <label>Color *</label>
-                                                    <select class="form-control" name="variants[{{ $index }}][color_id]" required>
-                                                        <option value="">Select Color</option>
-                                                        @foreach($colors as $color)
-                                                            <option value="{{ $color->id }}" {{ $variant->color_id == $color->id ? 'selected' : '' }}>
-                                                                {{ $color->name }}
-                                                            </option>
-                                                        @endforeach
-                                                    </select>
-                                                </div>
-                                                <div class="col-md-3">
-                                                    <label>Stock *</label>
-                                                    <input type="number" class="form-control" name="variants[{{ $index }}][stock]" min="0" value="{{ old("variants.{$index}.stock", $variant->stock) }}" required>
-                                                </div>
-                                                <div class="col-md-3">
-                                                    <label>Photos (Add New)</label>
-                                                    <input type="file" class="form-control-file" name="variants[{{ $index }}][photos][]" multiple accept="image/*">
-                                                    <small class="text-muted d-block">Existing photos won’t be shown. Only new uploads will be added.</small>
-                                                </div>
-                                            </div>
-                                            <button type="button" class="btn btn-sm btn-outline-danger mt-2 remove-variant">
-                                                <i class="fas fa-trash"></i> Remove Variant
-                                            </button>
+                                @foreach($product->productDetails as $index => $variant)
+                                <div class="variant-item mb-3 p-3 border rounded bg-white">
+                                    <input type="hidden" name="variants[{{ $index }}][id]" value="{{ $variant->id }}">
+                                    <div class="row">
+                                        <div class="col-md-3">
+                                            <label>Size *</label>
+                                            <select class="form-control" name="variants[{{ $index }}][size_id]" required>
+                                                <option value="">Select Size</option>
+                                                @foreach($sizes as $size)
+                                                <option value="{{ $size->id }}" {{ $variant->size_id == $size->id ? 'selected' : '' }}>
+                                                    {{ $size->name }}
+                                                </option>
+                                                @endforeach
+                                            </select>
                                         </div>
-                                    @endforeach
-                                    @php $variantIndex = $product->productDetails->count(); @endphp
+                                        <div class="col-md-3">
+                                            <label>Color *</label>
+                                            <select class="form-control" name="variants[{{ $index }}][color_id]" required>
+                                                <option value="">Select Color</option>
+                                                @foreach($colors as $color)
+                                                <option value="{{ $color->id }}" {{ $variant->color_id == $color->id ? 'selected' : '' }}>
+                                                    {{ $color->name }}
+                                                </option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label>Stock *</label>
+                                            <input type="number" class="form-control" name="variants[{{ $index }}][stock]" min="0" value="{{ old("variants.{$index}.stock", $variant->stock) }}" required>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label>Photos (Add New)</label>
+                                            <input type="file" class="form-control-file" name="variants[{{ $index }}][photos][]" multiple accept="image/*">
+                                            <small class="text-muted d-block">Existing photos won’t be shown. Only new uploads will be added.</small>
+                                        </div>
+                                    </div>
+                                    <button type="button" class="btn btn-sm btn-outline-danger mt-2 remove-variant">
+                                        <i class="fas fa-trash"></i> Remove Variant
+                                    </button>
+                                </div>
+                                @endforeach
+                                @php $variantIndex = $product->productDetails->count(); @endphp
                                 @else
-                                    @php $variantIndex = 0; @endphp
+                                @php $variantIndex = 0; @endphp
                                 @endif
                             </div>
 
@@ -218,7 +218,7 @@
                 <select class="form-control" name="variants[INDEX][size_id]" required>
                     <option value="">Select Size</option>
                     @foreach($sizes as $size)
-                        <option value="{{ $size->id }}">{{ $size->name }}</option>
+                    <option value="{{ $size->id }}">{{ $size->name }}</option>
                     @endforeach
                 </select>
             </div>
@@ -227,7 +227,7 @@
                 <select class="form-control" name="variants[INDEX][color_id]" required>
                     <option value="">Select Color</option>
                     @foreach($colors as $color)
-                        <option value="{{ $color->id }}">{{ $color->name }}</option>
+                    <option value="{{ $color->id }}">{{ $color->name }}</option>
                     @endforeach
                 </select>
             </div>
@@ -252,19 +252,49 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
     $(document).ready(function() {
-        let variantIndex = @json($variantIndex ?? 0);
+        if (window.productCreateInitialized) return;
+        window.productCreateInitialized = true;
 
-        $('#addVariant').on('click', function() {
+        // Fungsi untuk mendapatkan indeks terbesar yang sedang digunakan
+        function getMaxVariantIndex() {
+            let maxIndex = -1;
+            $('.variant-item').each(function() {
+                // Cari input dengan name yang mengandung 'variants[' dan angka indeks
+                const inputs = $(this).find('input, select');
+                inputs.each(function() {
+                    const name = $(this).attr('name');
+                    if (name && name.includes('variants[')) {
+                        const match = name.match(/variants\[(\d+)\]/);
+                        if (match) {
+                            const index = parseInt(match[1]);
+                            if (index > maxIndex) maxIndex = index;
+                        }
+                    }
+                });
+            });
+            return maxIndex;
+        }
+
+        // Inisialisasi variantIndex berdasarkan indeks terbesar yang ada
+        let variantIndex = getMaxVariantIndex() + 1;
+
+        function addVariant() {
             let template = $('#variantTemplate').html();
-            if (!template) return;
-
+            if (!template) {
+                console.error('Variant template not found');
+                return;
+            }
             template = template.replace(/INDEX/g, variantIndex);
             $('#variantsContainer').append(template);
             variantIndex++;
-        });
+        }
 
-        $(document).on('click', '.remove-variant', function() {
+        $('#addVariant').off('click').on('click', addVariant);
+
+        $(document).off('click', '.remove-variant').on('click', '.remove-variant', function() {
             $(this).closest('.variant-item').remove();
+            // Setelah menghapus, perbarui variantIndex berdasarkan indeks terbesar yang tersisa
+            variantIndex = getMaxVariantIndex() + 1;
         });
 
         $('#productForm').on('submit', function(e) {
