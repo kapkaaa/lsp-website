@@ -222,26 +222,36 @@
 @push('js')
 <script>
 $(document).ready(function() {
+    // Hindari double execution
+    if (window.productCreateInitialized) return;
+    window.productCreateInitialized = true;
+
     let variantIndex = 0;
 
-    // Add variant
-    $('#addVariant').click(function() {
+    function addVariant() {
         let template = $('#variantTemplate').html();
+        if (!template) {
+            console.error('Variant template not found');
+            return;
+        }
         template = template.replace(/INDEX/g, variantIndex);
         $('#variantsContainer').append(template);
         variantIndex++;
-    });
+    }
+
+    // Bind click once
+    $('#addVariant').off('click').on('click', addVariant);
 
     // Remove variant
-    $(document).on('click', '.remove-variant', function() {
+    $(document).off('click', '.remove-variant').on('click', '.remove-variant', function() {
         $(this).closest('.variant-item').remove();
     });
 
-    // Add first variant by default
-    $('#addVariant').click();
+    // Add first variant
+    addVariant();
 
     // Form validation
-    $('#productForm').submit(function(e) {
+    $('#productForm').off('submit').on('submit', function(e) {
         if ($('.variant-item').length === 0) {
             e.preventDefault();
             Swal.fire({

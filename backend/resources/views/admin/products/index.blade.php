@@ -20,7 +20,7 @@
                         </a>
                     </div>
                 </div>
-                <div class="card-body table-responsive p-0">
+                <div class="card-body table-responsive">
                     <table id="productsTable" class="table table-hover table-striped">
                         <thead>
                             <tr>

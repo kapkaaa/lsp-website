@@ -181,6 +181,18 @@ class ProductController extends Controller
                     // Jangan update size_id atau color_id di sini untuk keamanan
                 ]);
             } else {
+                // Validasi agar tidak ada duplikasi kombinasi size dan color untuk produk ini
+                $duplicateCheck = ProductDetail::where('product_id', $product->id)
+                                              ->where('size_id', $variantData['size_id'])
+                                              ->where('color_id', $variantData['color_id'])
+                                              ->exists();
+
+                if ($duplicateCheck) {
+                    return redirect()->back()
+                                     ->withErrors(['error' => 'Varian dengan ukuran dan warna ini sudah ada!'])
+                                     ->withInput();
+                }
+
                 // Buat variant baru
                 $barcode = $this->generateBarcode();
                 $productDetail = ProductDetail::create([
