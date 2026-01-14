@@ -91,7 +91,7 @@ class OperationalHourController extends Controller
 
         $request->validate([
             'days' => 'required|array|min:1',
-            'days.*' => 'string|in:Monday,Tuesday,Wednesday,Thursday,Friday,Saturday,Sunday',
+            'days.*' => 'string|in:Senin,Selasa,Rabu,Kamis,Jumat,Sabtu,Minggu',
             'open_time' => 'required|date_format:H:i',
             'close_time' => 'required|date_format:H:i|after:open_time',
             'status' => 'required|in:open,closed',

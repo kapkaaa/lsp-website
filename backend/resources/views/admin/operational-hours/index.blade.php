@@ -30,7 +30,7 @@
                         </button>
                     </div>
                 </div>
-                <div class="card-body table-responsive p-0">
+                <div class="card-body table-responsive">
                     <table id="operationalHoursTable" class="table table-hover table-striped">
                         <thead>
                             <tr>
@@ -97,7 +97,7 @@
             <div class="card card-widget widget-user-2">
                 <div class="widget-user-header bg-info">
                     <h3 class="widget-user-username">Current Status</h3>
-                    <h5 class="widget-user-desc">{{ now()->format('l, d M Y H:i') }}</h5>
+                    <h5 class="widget-user-desc">{{ now()->translatedFormat('l, d M Y H:i') }}</h5>
                 </div>
             </div>
         </div>
@@ -180,7 +180,7 @@
                         <div class="form-group">
                             <label>Select Days <span class="text-danger">*</span></label>
                             <div class="row">
-                                @foreach(['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'] as $day)
+                                @foreach(['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu'] as $day)
                                 <div class="col-6">
                                     <div class="custom-control custom-checkbox">
                                         <input type="checkbox" class="custom-control-input" id="day-{{ $day }}" name="days[]" value="{{ $day }}">

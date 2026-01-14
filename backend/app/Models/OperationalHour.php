@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 
+Carbon::setLocale('id');
+
 // ============ OperationalHour Model ============
 class OperationalHour extends Model
 {
@@ -25,7 +27,7 @@ class OperationalHour extends Model
     // Helper Methods
     public static function isOperational($serviceType = 'Website')
     {
-        $currentDay = Carbon::now()->format('l'); // Monday, Tuesday, etc
+        $currentDay = Carbon::now()->translatedFormat('l'); // Monday, Tuesday, etc
         $currentTime = Carbon::now()->format('H:i:s');
 
         $operationalHour = self::where('service_type', $serviceType)
@@ -48,7 +50,7 @@ class OperationalHour extends Model
 
     public static function getOperationalMessage($serviceType = 'Website')
     {
-        $currentDay = Carbon::now()->format('l');
+        $currentDay = Carbon::now()->translatedFormat('l');
         
         $operationalHour = self::where('service_type', $serviceType)
             ->where('day', $currentDay)
@@ -74,7 +76,7 @@ class OperationalHour extends Model
 
     public static function getTodayOperationalHours($serviceType = 'Website')
     {
-        $currentDay = Carbon::now()->format('l');
+        $currentDay = Carbon::now()->translatedFormat('l');
         
         return self::where('service_type', $serviceType)
             ->where('day', $currentDay)
