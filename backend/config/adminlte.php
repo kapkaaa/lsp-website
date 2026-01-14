@@ -4,31 +4,36 @@ return [
     'title' => 'DistroZone',
     'title_prefix' => '',
     'title_postfix' => ' - Management System',
-    
+
     'use_ico_only' => false,
     'use_full_favicon' => false,
-    
+
     'logo' => 'DistroZone',
     'logo_img' => 'vendor/adminlte/dist/img/AdminLTELogo.png',
     'logo_img_class' => 'brand-image img-circle elevation-3',
     'logo_img_xl' => null,
     'logo_img_xl_class' => 'brand-image-xs',
     'logo_img_alt' => 'DistroZone',
-    
+
+    'preloader' => [
+        'enabled' => false,
+    ],
+
+
     'usermenu_enabled' => true,
     'usermenu_header' => false,
     'usermenu_header_class' => 'bg-primary',
     'usermenu_image' => false,
     'usermenu_desc' => false,
     'usermenu_profile_url' => false,
-    
+
     'layout_topnav' => null,
     'layout_boxed' => null,
     'layout_fixed_sidebar' => true,
     'layout_fixed_navbar' => true,
     'layout_fixed_footer' => null,
     'layout_dark_mode' => null,
-    
+
     'classes_body' => '',
     'classes_brand' => '',
     'classes_brand_text' => '',
@@ -40,7 +45,7 @@ return [
     'classes_topnav' => 'navbar-white navbar-light',
     'classes_topnav_nav' => 'navbar-expand',
     'classes_topnav_container' => 'container',
-    
+
     'sidebar_mini' => 'lg',
     'sidebar_collapse' => false,
     'sidebar_collapse_auto_size' => false,
@@ -50,7 +55,7 @@ return [
     'sidebar_scrollbar_auto_hide' => 'l',
     'sidebar_nav_accordion' => true,
     'sidebar_nav_animation_speed' => 300,
-    
+
     'right_sidebar' => false,
     'right_sidebar_icon' => 'fas fa-cogs',
     'right_sidebar_theme' => 'dark',
@@ -58,7 +63,7 @@ return [
     'right_sidebar_push' => true,
     'right_sidebar_scrollbar_theme' => 'os-theme-light',
     'right_sidebar_scrollbar_auto_hide' => 'l',
-    
+
     'use_route_url' => false,
     'dashboard_url' => '/admin/dashboard',
     'logout_url' => 'logout',
@@ -67,11 +72,11 @@ return [
     'password_reset_url' => null,
     'password_email_url' => null,
     'profile_url' => false,
-    
+
     'enabled_laravel_mix' => false,
     'laravel_mix_css_path' => 'css/app.css',
     'laravel_mix_js_path' => 'js/app.js',
-    
+
     'menu' => [
         // Navbar items:
         [
@@ -83,7 +88,7 @@ return [
             'type'         => 'fullscreen-widget',
             'topnav_right' => true,
         ],
-        
+
         // Sidebar items:
         [
             'type' => 'sidebar-menu-search',
@@ -168,7 +173,7 @@ return [
             'icon' => 'fas fa-fw fa-comments',
         ],
     ],
-    
+
     'plugins' => [
         'Datatables' => [
             'active' => true,
@@ -226,6 +231,6 @@ return [
             ],
         ],
     ],
-    
+
     'livewire' => false,
 ];
