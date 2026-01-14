@@ -24,7 +24,7 @@
                     <div class="card-body">
                         <div class="form-group">
                             <label>Day</label>
-                            <input type="text" class="form-control" value="{{ $operationalHour->day }}" readonly>
+                            <input type="text" class="form-control" name="day" value="{{ $operationalHour->day }}" readonly>
                             <small class="text-muted">Day cannot be changed</small>
                         </div>
 
