@@ -124,12 +124,12 @@
                             <p>Online Orders</p>
                         </a>
                     </li>
-                    <li class="nav-item">
+                    <!-- <li class="nav-item">
                         <a href="{{ route('cashier.customer-service.index') }}" class="nav-link {{ request()->routeIs('cashier.customer-service.*') ? 'active' : '' }}">
                             <i class="nav-icon fas fa-comments"></i>
                             <p>Customer Service</p>
                         </a>
-                    </li>
+                    </li> -->
                 </ul>
             </nav>
         </div>

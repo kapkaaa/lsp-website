@@ -28,14 +28,10 @@ class CustomerServiceController extends Controller
             ->where('is_read', false)
             ->update(['is_read' => true]);
 
-        if ($request->expectsJson()) {
-            return response()->json([
-                'success' => true,
-                'data' => $messages
-            ]);
-        }
-
-        return view('admin.customer-service.messages', compact('messages', 'userId'));
+        return response()->json([
+            'success' => true,
+            'data' => $messages
+        ]);
     }
 
     public function send(Request $request)
