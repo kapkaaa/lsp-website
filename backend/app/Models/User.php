@@ -78,7 +78,7 @@ class User extends Authenticatable
 
     public function isKasir()
     {
-        return $this->role->name === 'Kasir';
+        return $this->role->name === 'Cashier';
     }
 
     public function isCustomer()

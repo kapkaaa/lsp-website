@@ -32,7 +32,7 @@ class CheckRole
         if ($user->isAdmin()) {
             return redirect()->route('admin.dashboard')->with('error', 'Unauthorized access');
         } elseif ($user->isKasir()) {
-            return redirect()->route('cashier.pos.index')->with('error', 'Unauthorized access');
+            return redirect()->route('cashier.dashboard')->with('error', 'Unauthorized access');
         } else {
             return redirect()->route('customer.home')->with('error', 'Unauthorized access');
         }

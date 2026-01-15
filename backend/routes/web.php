@@ -35,7 +35,7 @@ Route::get('/', function () {
         if ($user->isAdmin()) {
             return redirect()->route('admin.dashboard');
         } elseif ($user->isKasir()) {
-            return redirect()->route('admin.dashboard'); // Kasir juga ke admin
+            return redirect()->route('cashier.dashboard');
         }
     }
     return redirect()->route('login');
@@ -166,8 +166,11 @@ Route::middleware(['auth', 'role:Admin,Kasir'])->prefix('admin')->name('admin.')
 });
 
 // ==================== Cashier Routes ====================
-Route::middleware(['auth', 'role:Kasir'])->prefix('cashier')->name('cashier.')->group(function () {
-    
+Route::middleware(['auth', 'role:Cashier'])->prefix('cashier')->name('cashier.')->group(function () {
+
+    // Dashboard
+    Route::get('/dashboard', [\App\Http\Controllers\Cashier\DashboardController::class, 'index'])->name('dashboard');
+
     // Point of Sale (POS)
     Route::prefix('pos')->name('pos.')->group(function () {
         Route::get('/', [POSController::class, 'index'])->name('index');
