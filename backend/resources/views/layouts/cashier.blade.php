@@ -119,13 +119,13 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a href="{{ route('admin.orders.index') }}" class="nav-link {{ request()->routeIs('admin.orders.*') ? 'active' : '' }}">
+                        <a href="{{ route('cashier.orders.index') }}" class="nav-link {{ request()->routeIs('cashier.orders.*') ? 'active' : '' }}">
                             <i class="nav-icon fas fa-shopping-cart"></i>
                             <p>Online Orders</p>
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a href="{{ route('admin.customer-service.index') }}" class="nav-link {{ request()->routeIs('admin.customer-service.*') ? 'active' : '' }}">
+                        <a href="{{ route('cashier.customer-service.index') }}" class="nav-link {{ request()->routeIs('cashier.customer-service.*') ? 'active' : '' }}">
                             <i class="nav-icon fas fa-comments"></i>
                             <p>Customer Service</p>
                         </a>
