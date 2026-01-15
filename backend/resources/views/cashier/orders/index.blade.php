@@ -1,6 +1,6 @@
 @extends('layouts.cashier')
 
-@section('title', 'Online Orders')
+@section('title', 'Orders Management')  
 
 @section('content_header')
     <h1>Online Orders</h1>
