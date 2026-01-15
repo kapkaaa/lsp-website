@@ -100,7 +100,7 @@ class AuthController extends Controller
         if ($user->isAdmin()) {
             return redirect()->route('admin.dashboard');
         } elseif ($user->isKasir()) {
-            return redirect()->route('cashier.pos.index');
+            return redirect()->route('cashier.dashboard');
         } else {
             return redirect()->route('customer.home');
         }
