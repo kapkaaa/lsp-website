@@ -144,8 +144,8 @@ Route::middleware(['auth', 'role:Admin'])->prefix('admin')->name('admin.')->grou
     });
 });
 
-// ==================== Admin & Kasir Shared Routes ====================
-Route::middleware(['auth', 'role:Admin,Kasir'])->prefix('admin')->name('admin.')->group(function () {
+// ==================== Admin & Cashier Shared Routes ====================
+Route::middleware(['auth', 'role:Admin,Cashier'])->prefix('admin')->name('admin.')->group(function () {
     
     // Orders Management
     Route::prefix('orders')->name('orders.')->group(function () {
@@ -178,5 +178,19 @@ Route::middleware(['auth', 'role:Cashier'])->prefix('cashier')->name('cashier.')
         Route::post('/process', [POSController::class, 'process'])->name('process');
         Route::get('/print/{id}', [POSController::class, 'printReceipt'])->name('print');
         Route::get('/history', [POSController::class, 'getTransactionHistory'])->name('history');
+    });
+
+    // Orders (for Cashier)
+    Route::prefix('orders')->name('orders.')->group(function () {
+        Route::get('/', [App\Http\Controllers\Cashier\OrderController::class, 'index'])->name('index');
+        Route::get('/{order}', [App\Http\Controllers\Cashier\OrderController::class, 'show'])->name('show');
+    });
+
+    // Customer Service (for Cashier)
+    Route::prefix('customer-service')->name('customer-service.')->group(function () {
+        Route::get('/', [App\Http\Controllers\Cashier\CustomerServiceController::class, 'index'])->name('index');
+        Route::get('/messages/{userId}', [App\Http\Controllers\Cashier\CustomerServiceController::class, 'getMessages'])->name('messages');
+        Route::post('/send', [App\Http\Controllers\Cashier\CustomerServiceController::class, 'send'])->name('send');
+        Route::get('/unread-count', [App\Http\Controllers\Cashier\CustomerServiceController::class, 'getUnreadCount'])->name('unread-count');
     });
 });
