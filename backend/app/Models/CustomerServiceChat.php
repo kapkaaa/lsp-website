@@ -75,6 +75,7 @@ class CustomerServiceChat extends Model
                 });
             })
             ->get()
-            ->pluck('sender');
+            ->pluck('sender')
+            ->unique('id');
     }
 }
