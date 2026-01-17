@@ -2,11 +2,14 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 // ============ Product Model ============
 class Product extends Model
 {
+    use HasFactory;
+
     protected $fillable = [
         'brand_id',
         'type_id',
