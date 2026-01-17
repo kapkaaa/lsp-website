@@ -13,9 +13,13 @@ class ProductController extends Controller
      */
     public function index()
     {
-        $products = Product::with(['productDetails', 'productDetails.productVariants', 'productDetails.productPhotos'])
-            ->whereHas('productDetails')
-            ->paginate(12); // Adjust pagination as needed
+        $products = Product::with([
+            'brand',
+            'type',
+            'productDetails',
+            'productDetails.Photos'
+        ])
+        ->paginate(12); // Adjust pagination as needed
 
         return response()->json([
             'data' => $products,
@@ -30,8 +34,7 @@ class ProductController extends Controller
     {
         $product = Product::with([
             'productDetails',
-            'productDetails.productVariants',
-            'productDetails.productPhotos',
+            'productDetails.Photos',
             'brand',
             'type'
         ])->findOrFail($id);
