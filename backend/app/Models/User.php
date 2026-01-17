@@ -2,47 +2,95 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
 class User extends Authenticatable
 {
-    /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var list<string>
-     */
     protected $fillable = [
+        'role_id',
         'name',
-        'email',
+        'username',
         'password',
+        'nik',
+        'address',
+        'city',
+        'phone',
+        'status'
     ];
 
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var list<string>
-     */
     protected $hidden = [
         'password',
         'remember_token',
     ];
 
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
     protected function casts(): array
     {
         return [
-            'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    // Relationships
+    public function role()
+    {
+        return $this->belongsTo(Role::class);
+    }
+
+    public function orders()
+    {
+        return $this->hasMany(Order::class, 'buyer_id');
+    }
+
+    public function approvedOrders()
+    {
+        return $this->hasMany(Order::class, 'approved_by');
+    }
+
+    public function transactions()
+    {
+        return $this->hasMany(Transaction::class);
+    }
+
+    public function payments()
+    {
+        return $this->hasMany(Payment::class);
+    }
+
+    public function sentChats()
+    {
+        return $this->hasMany(CustomerServiceChat::class, 'sender_id');
+    }
+
+    public function receivedChats()
+    {
+        return $this->hasMany(CustomerServiceChat::class, 'receiver_id');
+    }
+
+    // Helper Methods
+    public function isAdmin()
+    {
+        return $this->role->name === 'Admin';
+    }
+
+    public function isKasir()
+    {
+        return $this->role->name === 'Cashier';
+    }
+
+    public function isCustomer()
+    {
+        return $this->role->name === 'Customer';
+    }
+
+    public function hasRole($roles)
+    {
+        if (is_array($roles)) {
+            return in_array($this->role->name, $roles);
+        }
+        return $this->role->name === $roles;
     }
 }
