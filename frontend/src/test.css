@@ -1,0 +1,3 @@
+.test-bg {
+    @apply bg-blue-500 text-white p-8 rounded-lg;
+  }
