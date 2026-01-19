@@ -10,7 +10,6 @@ import {
 import apiClient from '../services/apiClient';
 import Loading from '../components/Loading';
 import Button from '../components/Button';
-import Input from '../components/Input';
 import { formatCurrency } from '../utils/formatters';
 import { calculateWeight, calculateShippingCost } from '../utils/shippingCalculator';
 import { useUser } from '../contexts/UserContext';

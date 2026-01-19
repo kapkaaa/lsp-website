@@ -6,7 +6,6 @@ import {
 } from '@heroicons/react/24/outline';
 import apiClient from '../services/apiClient';
 import Button from '../components/Button';
-import Badge from '../components/Badge';
 import { formatTime } from '../utils/formatters';
 import { useUser } from '../contexts/UserContext';
 
@@ -157,8 +156,8 @@ const CustomerServiceChat: React.FC = () => {
                 >
                   <div
                     className={`max-w-[70%] ${message.sender_type === 'customer'
-                        ? 'bg-cyan-500 text-white rounded-l-xl rounded-tr-xl'
-                        : 'bg-gray-100 text-gray-900 rounded-r-xl rounded-tl-xl'
+                      ? 'bg-cyan-500 text-white rounded-l-xl rounded-tr-xl'
+                      : 'bg-gray-100 text-gray-900 rounded-r-xl rounded-tl-xl'
                       } px-4 py-3 shadow-sm`}
                   >
                     {message.sender_type === 'kasir' && (
@@ -169,8 +168,8 @@ const CustomerServiceChat: React.FC = () => {
                     <p className="text-sm leading-relaxed">{message.message}</p>
                     <p
                       className={`text-xs mt-1 ${message.sender_type === 'customer'
-                          ? 'text-cyan-100'
-                          : 'text-gray-500'
+                        ? 'text-cyan-100'
+                        : 'text-gray-500'
                         }`}
                     >
                       {formatTime(message.created_at)}

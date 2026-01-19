@@ -1,4 +1,4 @@
-import React, { InputHTMLAttributes, useState } from 'react';
+import React, { type InputHTMLAttributes, useState } from 'react';
 
 interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
     label?: string;
@@ -36,8 +36,8 @@ const Input: React.FC<InputProps> = ({
                 {label && (
                     <label
                         className={`absolute left-4 transition-all duration-200 pointer-events-none ${isFocused || hasValue
-                                ? 'top-2 text-xs text-cyan-600'
-                                : 'top-1/2 -translate-y-1/2 text-base text-gray-500'
+                            ? 'top-2 text-xs text-cyan-600'
+                            : 'top-1/2 -translate-y-1/2 text-base text-gray-500'
                             }`}
                     >
                         {label}
