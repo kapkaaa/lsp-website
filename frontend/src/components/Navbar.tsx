@@ -52,8 +52,8 @@ const Navbar: React.FC = () => {
             to="/"
             className="flex items-center space-x-2 group"
           >
-            <div className="w-10 h-10 bg-gradient-to-br from-cyan-500 to-cyan-700 rounded-lg flex items-center justify-center shadow-md group-hover:shadow-glow transition-all">
-              <span className="text-white font-bold text-xl">DZ</span>
+            <div className="w-10 h-10 bg-transparent flex items-center justify-center">
+              <img src="/logo.png" alt="DistroZone Logo" className="w-full h-full object-contain" />
             </div>
             <span className="text-2xl font-heading font-bold gradient-text">
               DistroZone
@@ -79,8 +79,8 @@ const Navbar: React.FC = () => {
             <Link
               to="/products"
               className={`px-4 py-2 rounded-lg font-medium transition-colors ${isActive('/products')
-                  ? 'text-cyan-600 bg-cyan-50'
-                  : 'text-gray-700 hover:text-cyan-600 hover:bg-gray-50'
+                ? 'text-cyan-600 bg-cyan-50'
+                : 'text-gray-700 hover:text-cyan-600 hover:bg-gray-50'
                 }`}
             >
               Produk
@@ -91,8 +91,8 @@ const Navbar: React.FC = () => {
                 <Link
                   to="/cart"
                   className={`px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2 relative ${isActive('/cart')
-                      ? 'text-cyan-600 bg-cyan-50'
-                      : 'text-gray-700 hover:text-cyan-600 hover:bg-gray-50'
+                    ? 'text-cyan-600 bg-cyan-50'
+                    : 'text-gray-700 hover:text-cyan-600 hover:bg-gray-50'
                     }`}
                 >
                   <ShoppingCartIcon className="h-5 w-5" />
@@ -106,8 +106,8 @@ const Navbar: React.FC = () => {
                 <Link
                   to="/orders"
                   className={`px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2 ${isActive('/orders')
-                      ? 'text-cyan-600 bg-cyan-50'
-                      : 'text-gray-700 hover:text-cyan-600 hover:bg-gray-50'
+                    ? 'text-cyan-600 bg-cyan-50'
+                    : 'text-gray-700 hover:text-cyan-600 hover:bg-gray-50'
                     }`}
                 >
                   <ClipboardDocumentListIcon className="h-5 w-5" />
@@ -117,8 +117,8 @@ const Navbar: React.FC = () => {
                 <Link
                   to="/chat"
                   className={`px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2 ${isActive('/chat')
-                      ? 'text-cyan-600 bg-cyan-50'
-                      : 'text-gray-700 hover:text-cyan-600 hover:bg-gray-50'
+                    ? 'text-cyan-600 bg-cyan-50'
+                    : 'text-gray-700 hover:text-cyan-600 hover:bg-gray-50'
                     }`}
                 >
                   <ChatBubbleLeftRightIcon className="h-5 w-5" />
@@ -208,8 +208,8 @@ const Navbar: React.FC = () => {
                 to="/"
                 onClick={() => setMobileMenuOpen(false)}
                 className={`block px-4 py-3 rounded-lg font-medium transition-colors ${isActive('/')
-                    ? 'text-cyan-600 bg-cyan-50'
-                    : 'text-gray-700 hover:bg-gray-50'
+                  ? 'text-cyan-600 bg-cyan-50'
+                  : 'text-gray-700 hover:bg-gray-50'
                   }`}
               >
                 Home
@@ -218,8 +218,8 @@ const Navbar: React.FC = () => {
                 to="/products"
                 onClick={() => setMobileMenuOpen(false)}
                 className={`block px-4 py-3 rounded-lg font-medium transition-colors ${isActive('/products')
-                    ? 'text-cyan-600 bg-cyan-50'
-                    : 'text-gray-700 hover:bg-gray-50'
+                  ? 'text-cyan-600 bg-cyan-50'
+                  : 'text-gray-700 hover:bg-gray-50'
                   }`}
               >
                 Produk
@@ -231,8 +231,8 @@ const Navbar: React.FC = () => {
                     to="/cart"
                     onClick={() => setMobileMenuOpen(false)}
                     className={`flex items-center gap-2 px-4 py-3 rounded-lg font-medium transition-colors ${isActive('/cart')
-                        ? 'text-cyan-600 bg-cyan-50'
-                        : 'text-gray-700 hover:bg-gray-50'
+                      ? 'text-cyan-600 bg-cyan-50'
+                      : 'text-gray-700 hover:bg-gray-50'
                       }`}
                   >
                     <ShoppingCartIcon className="h-5 w-5" />
@@ -242,8 +242,8 @@ const Navbar: React.FC = () => {
                     to="/orders"
                     onClick={() => setMobileMenuOpen(false)}
                     className={`flex items-center gap-2 px-4 py-3 rounded-lg font-medium transition-colors ${isActive('/orders')
-                        ? 'text-cyan-600 bg-cyan-50'
-                        : 'text-gray-700 hover:bg-gray-50'
+                      ? 'text-cyan-600 bg-cyan-50'
+                      : 'text-gray-700 hover:bg-gray-50'
                       }`}
                   >
                     <ClipboardDocumentListIcon className="h-5 w-5" />
@@ -253,8 +253,8 @@ const Navbar: React.FC = () => {
                     to="/chat"
                     onClick={() => setMobileMenuOpen(false)}
                     className={`flex items-center gap-2 px-4 py-3 rounded-lg font-medium transition-colors ${isActive('/chat')
-                        ? 'text-cyan-600 bg-cyan-50'
-                        : 'text-gray-700 hover:bg-gray-50'
+                      ? 'text-cyan-600 bg-cyan-50'
+                      : 'text-gray-700 hover:bg-gray-50'
                       }`}
                   >
                     <ChatBubbleLeftRightIcon className="h-5 w-5" />

@@ -42,8 +42,8 @@ const Login: React.FC = () => {
       <div className="max-w-md w-full">
         {/* Logo/Brand */}
         <div className="text-center mb-8 animate-fade-in-up">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-cyan-500 to-cyan-700 rounded-2xl shadow-lg shadow-cyan-500/50 mb-4">
-            <span className="text-white font-bold text-2xl">DZ</span>
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-transparent mb-4">
+            <img src="/logo.png" alt="DistroZone Logo" className="w-full h-full object-contain" />
           </div>
           <h1 className="text-3xl font-heading font-bold text-gray-900 mb-2">
             Selamat Datang Kembali!
