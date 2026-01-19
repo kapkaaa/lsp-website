@@ -1,6 +1,14 @@
 {{-- resources/views/layouts/admin.blade.php --}}
 @extends('adminlte::page')
 
+@section('favicons')
+    <link rel="icon" type="image/png" href="{{ asset('logo.png') }}">
+@stop
+
+@section('meta_tags')
+    <link rel="icon" type="image/png" href="{{ asset('logo.png') }}">
+@stop
+
 @section('title', config('app.name'))
 
 @section('content_header')

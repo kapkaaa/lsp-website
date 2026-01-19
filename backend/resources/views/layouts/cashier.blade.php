@@ -7,6 +7,9 @@
 
     <title>@yield('title', 'Cashier Dashboard') - DistroZone</title>
 
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="{{ asset('logo.png') }}">
+
     <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="{{ asset('vendor/fontawesome-free/css/all.min.css') }}">
     
@@ -71,7 +74,7 @@
     <!-- Main Sidebar Container -->
     <aside class="main-sidebar elevation-4 sidebar-dark-primary">
         <a href="{{ url('/customer') }}" class="brand-link">
-            <img src="{{ asset('vendor/adminlte/dist/img/AdminLTELogo.png') }}" alt="DistroZone Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
+            <img src="{{ asset('logo.png') }}" alt="DistroZone Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
             <span class="brand-text font-weight-light">DistroZone</span>
         </a>
 

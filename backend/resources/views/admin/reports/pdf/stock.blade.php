@@ -19,6 +19,7 @@
 </head>
 <body>
     <div class="header">
+        <img src="{{ public_path('logo.png') }}" alt="Logo" style="height: 60px; margin-bottom: 10px;">
         <h1>DISTROZONE</h1>
         <h2>Stock Report</h2>
         <p>Generated: {{ $generatedAt }}</p>

@@ -20,6 +20,7 @@
 </head>
 <body>
     <div class="header">
+        <img src="{{ public_path('logo.png') }}" alt="Logo" style="height: 60px; margin-bottom: 10px;">
         <h1>DISTROZONE</h1>
         <h2>Profit Report</h2>
         <p>Period: {{ \Carbon\Carbon::parse($startDate)->format('d M Y') }} - {{ \Carbon\Carbon::parse($endDate)->format('d M Y') }}</p>
