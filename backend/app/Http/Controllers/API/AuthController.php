@@ -55,13 +55,18 @@ class AuthController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8|confirmed',
+            'phone' => 'nullable|string|max:20',
+            'address' => 'nullable|string',
         ]);
 
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
-            'role' => 'Customer' // Default role for registered users
+            'role_id' => 3, // Default role: Customer
+            'phone' => $request->phone,
+            'address' => $request->address,
+            'status' => 'active',
         ]);
 
         $token = $user->createToken('auth-token')->plainTextToken;
