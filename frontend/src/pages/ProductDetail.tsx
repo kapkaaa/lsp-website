@@ -241,7 +241,18 @@ const ProductDetailPage: React.FC = () => {
                     key={color.id}
                     onClick={() => {
                       setSelectedColor(color.id);
-                      setSelectedSize(null); // Reset size when color changes
+                      // Find first available size for this color
+                      const firstAvailableSize = productDetails.find(
+                        d => d.color?.id === color.id && d.stock > 0
+                      );
+                      if (firstAvailableSize) {
+                        setSelectedSize(firstAvailableSize.size?.id);
+                      } else {
+                        // Fallback: select first size even if out of stock
+                        const firstSize = productDetails.find(d => d.color?.id === color.id);
+                        if (firstSize) setSelectedSize(firstSize.size?.id);
+                      }
+                      setSelectedImage(0); // Reset image when color changes
                     }}
                     className={`px-4 py-2 rounded-lg border-2 transition-all ${selectedColor === color.id
                       ? 'border-cyan-500 bg-cyan-50 text-cyan-700 font-semibold'
