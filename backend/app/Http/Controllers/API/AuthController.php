@@ -32,12 +32,15 @@ class AuthController extends Controller
         // Revoke all previous tokens
         $user->tokens()->delete();
 
+        // Establish session for Sanctum stateful auth
+        Auth::login($user);
+
         // Create new token
         $token = $user->createToken('auth-token')->plainTextToken;
 
         return response()->json([
             'message' => 'Login successful',
-            'user' => $user,
+            'user' => $user->load('role'),
             'token' => $token,
             'token_type' => 'Bearer'
         ]);

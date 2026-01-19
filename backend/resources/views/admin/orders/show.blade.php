@@ -190,7 +190,7 @@
                     <h3 class="card-title">Payment Proof</h3>
                 </div>
                 <div class="card-body text-center">
-                    <img src="{{ asset('storage/' . $order->payment_proof) }}"
+                    <img src="{{ $order->payment_proof_url }}"
                         alt="Payment Proof"
                         class="img-fluid"
                         style="max-height: 400px; cursor: pointer;"

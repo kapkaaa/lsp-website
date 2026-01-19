@@ -60,6 +60,22 @@ return [
             'report' => false,
         ],
 
+        'supabase' => [
+            'driver' => 's3',
+            'key' => env('SUPABASE_ACCESS_KEY_ID'),
+            'secret' => env('SUPABASE_SECRET_ACCESS_KEY'),
+            'region' => env('SUPABASE_DEFAULT_REGION', 'auto'), // Supabase recommends 'auto'
+            'bucket' => env('SUPABASE_BUCKET'),
+            'endpoint' => env('SUPABASE_ENDPOINT'),
+            'url' => env('SUPABASE_URL'),
+            'use_path_style_endpoint' => true, // Changed to true for Supabase to use path-style addressing
+            'visibility' => 'public',
+            'throw' => true,
+            'http' => [
+                'verify' => false,
+            ],
+        ],
+
     ],
 
     /*

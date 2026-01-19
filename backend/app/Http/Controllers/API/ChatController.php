@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
-use App\Models\Chat;
+use App\Models\CustomerServiceChat;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -17,7 +17,7 @@ class ChatController extends Controller
         $user = $request->user();
         
         // Get messages where user is either sender or receiver
-        $chats = Chat::where(function ($query) use ($user) {
+        $chats = CustomerServiceChat::where(function ($query) use ($user) {
                 $query->where('sender_id', $user->id)
                       ->orWhere('receiver_id', $user->id);
             })
@@ -43,7 +43,7 @@ class ChatController extends Controller
 
         $user = $request->user();
         
-        $chat = Chat::create([
+        $chat = CustomerServiceChat::create([
             'sender_id' => $user->id,
             'receiver_id' => $request->receiver_id,
             'message' => $request->message

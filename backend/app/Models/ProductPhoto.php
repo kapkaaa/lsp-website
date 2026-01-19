@@ -20,7 +20,17 @@ class ProductPhoto extends Model
     public function getPhotoUrlAttribute($value)
     {
         if ($value && !str_starts_with($value, 'http')) {
-            return asset('storage/' . $value);
+            try {
+                // Check if the file exists on the supabase disk and generate the appropriate URL
+                if (\Illuminate\Support\Facades\Storage::disk('supabase')->exists($value)) {
+                    return \Illuminate\Support\Facades\Storage::disk('supabase')->url($value);
+                }
+            } catch (\Exception $e) {
+                \Log::error('Error getting URL from Supabase:', ['error' => $e->getMessage(), 'value' => $value]);
+            }
+
+            // Fallback to default disk
+            return \Illuminate\Support\Facades\Storage::disk()->url($value);
         }
         return $value;
     }

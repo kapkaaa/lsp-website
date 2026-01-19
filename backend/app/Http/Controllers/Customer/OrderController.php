@@ -158,11 +158,22 @@ class OrderController extends Controller
 
         // Delete old payment proof if exists
         if ($order->payment_proof) {
-            \Storage::disk('public')->delete($order->payment_proof);
+            try {
+                \Storage::disk('supabase')->delete($order->payment_proof);
+            } catch (\Exception $e) {
+                \Log::warning('Failed to delete old payment proof from Supabase:', ['error' => $e->getMessage()]);
+                // Continue anyway, maybe the file doesn't exist anymore
+            }
         }
 
-        // Upload new payment proof
-        $path = $request->file('payment_proof')->store('payments', 'public');
+        try {
+            // Upload new payment proof to supabase
+            $path = $request->file('payment_proof')->store('payments', 'supabase');
+            \Log::info('Payment proof stored on Supabase:', ['path' => $path]);
+        } catch (\Exception $e) {
+            \Log::error('Failed to store payment proof on Supabase:', ['error' => $e->getMessage()]);
+            throw $e; // Re-throw to prevent silent failure
+        }
 
         $order->payment_proof = $path;
         $order->save();

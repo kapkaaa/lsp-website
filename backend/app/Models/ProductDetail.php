@@ -51,6 +51,12 @@ class ProductDetail extends Model
         return $this->hasMany(TransactionDetail::class);
     }
 
+    public function variantValues()
+    {
+        return $this->hasMany(ProductDetail::class, 'id', 'id')
+            ->with(['size', 'color']);
+    }
+
     // Helper Methods
     public function getFullName()
     {

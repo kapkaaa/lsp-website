@@ -18,8 +18,9 @@ class CartController extends Controller
         
         $cartItems = $user->cartItems()->with([
             'productDetail.product',
-            'productDetail.productVariants',
-            'productDetail.productPhotos'
+            'productDetail.photos',
+            'productDetail.size',
+            'productDetail.color'
         ])->get();
 
         $totalPrice = $cartItems->sum(function ($item) {

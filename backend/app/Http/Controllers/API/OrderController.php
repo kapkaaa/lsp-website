@@ -3,9 +3,7 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
-use App\Models\Order;
-use App\Models\OrderItem;
-use App\Models\Cart;
+use App\Models\OrderDetail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -19,7 +17,7 @@ class OrderController extends Controller
         $user = $request->user();
         
         $orders = Order::where('user_id', $user->id)
-            ->with(['orderItems', 'payment'])
+            ->with(['orderDetails', 'payment'])
             ->orderBy('created_at', 'desc')
             ->paginate(10);
 
@@ -66,27 +64,26 @@ class OrderController extends Controller
             'status' => 'pending' // Default status
         ]);
 
-        // Create order items
+        // Create order details
         foreach ($cartItems as $cartItem) {
-            OrderItem::create([
+            OrderDetail::create([
                 'order_id' => $order->id,
                 'product_detail_id' => $cartItem->product_detail_id,
                 'quantity' => $cartItem->quantity,
-                'price' => $cartItem->productDetail->price
+                'unit_price' => $cartItem->productDetail->price,
+                'total' => $cartItem->quantity * $cartItem->productDetail->price
             ]);
 
             // Reduce stock
             $productDetail = $cartItem->productDetail;
-            $productDetail->update([
-                'stock' => $productDetail->stock - $cartItem->quantity
-            ]);
+            $productDetail->increment('stock', -$cartItem->quantity); // Safer way or update directly
         }
 
         // Clear user's cart
         $user->cartItems()->delete();
 
         return response()->json([
-            'data' => $order->load('orderItems'),
+            'data' => $order->load('orderDetails'),
             'message' => 'Order created successfully'
         ], 201);
     }
@@ -100,7 +97,7 @@ class OrderController extends Controller
         
         $order = Order::where('id', $id)
             ->where('user_id', $user->id)
-            ->with(['orderItems', 'payment'])
+            ->with(['orderDetails', 'payment'])
             ->firstOrFail();
 
         return response()->json([

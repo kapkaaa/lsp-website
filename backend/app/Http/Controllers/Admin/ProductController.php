@@ -96,12 +96,22 @@ class ProductController extends Controller
             // Upload photos
             if ($request->hasFile("variants.{$index}.photos")) {
                 foreach ($request->file("variants.{$index}.photos") as $photo) {
-                    $path = $photo->store('products', 'public');
+                    try {
+                        // Store file on the supabase disk explicitly
+                        $path = $photo->store('products', 'supabase');
 
-                    ProductPhoto::create([
-                        'product_detail_id' => $productDetail->id,
-                        'photo_url' => $path
-                    ]);
+                        // Log the path for debugging
+                        \Log::info('File stored on Supabase in ProductController:', ['path' => $path]);
+
+                        ProductPhoto::create([
+                            'product_detail_id' => $productDetail->id,
+                            'photo_url' => $path
+                        ]);
+                    } catch (\Exception $e) {
+                        \Log::error('Failed to store photo on Supabase in ProductController:', ['error' => $e->getMessage()]);
+
+                        throw $e; // Re-throw to prevent silent failure
+                    }
                 }
             }
         }
@@ -163,7 +173,7 @@ class ProductController extends Controller
                 }
                 // Hapus foto lama
                 foreach ($detail->photos as $photo) {
-                    Storage::disk('public')->delete($photo->photo_url);
+                    Storage::disk()->delete($photo->photo_url);
                     $photo->delete();
                 }
                 $detail->delete();
@@ -208,11 +218,20 @@ class ProductController extends Controller
             // Upload foto baru (jika ada)
             if ($request->hasFile("variants.{$index}.photos")) {
                 foreach ($request->file("variants.{$index}.photos") as $photo) {
-                    $path = $photo->store('products', 'public');
-                    ProductPhoto::create([
-                        'product_detail_id' => $productDetail->id,
-                        'photo_url' => $path
-                    ]);
+                    try {
+                        // Store file on the supabase disk explicitly
+                        $path = $photo->store('products', 'supabase');
+                        \Log::info('File stored on Supabase in ProductController update method:', ['path' => $path]);
+
+                        ProductPhoto::create([
+                            'product_detail_id' => $productDetail->id,
+                            'photo_url' => $path
+                        ]);
+                    } catch (\Exception $e) {
+                        \Log::error('Failed to store photo on Supabase in ProductController update method:', ['error' => $e->getMessage()]);
+
+                        throw $e; // Re-throw to prevent silent failure
+                    }
                 }
             }
         }
@@ -233,7 +252,7 @@ class ProductController extends Controller
         foreach ($product->productDetails as $detail) {
             foreach ($detail->photos as $photo) {
                 if ($photo->photo_url) {
-                    Storage::disk('public')->delete($photo->photo_url);
+                    Storage::disk()->delete($photo->photo_url);
                 }
                 $photo->delete();
             }

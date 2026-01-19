@@ -17,7 +17,9 @@ class ProductController extends Controller
             'brand',
             'type',
             'productDetails',
-            'productDetails.Photos'
+            'productDetails.photos',
+            'productDetails.size',
+            'productDetails.color'
         ])
         ->paginate(12); // Adjust pagination as needed
 
@@ -34,7 +36,9 @@ class ProductController extends Controller
     {
         $product = Product::with([
             'productDetails',
-            'productDetails.Photos',
+            'productDetails.photos',
+            'productDetails.size',
+            'productDetails.color',
             'brand',
             'type'
         ])->findOrFail($id);
