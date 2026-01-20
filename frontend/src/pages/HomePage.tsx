@@ -10,7 +10,7 @@ import {
 } from '@heroicons/react/24/outline';
 import apiClient from '../services/apiClient';
 import ProductCard from '../components/ProductCard';
-import { ProductCardSkeleton } from '../components/Loading';
+import { ProductGridLoading } from '../components/Loading';
 
 interface Product {
   id: number;
@@ -184,11 +184,7 @@ const HomePage: React.FC = () => {
           </div>
 
           {loading ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              {[...Array(8)].map((_, i) => (
-                <ProductCardSkeleton key={i} />
-              ))}
-            </div>
+            <ProductGridLoading count={8} columns={4} />
           ) : products.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {products.map((product) => (
