@@ -26,11 +26,16 @@ interface Order {
   order_status: string;
   payment_method: string;
   payment_proof: string | null;
+  payment_proof_url: string | null;
   created_at: string;
   order_details: Array<{
-    product: { name: string };
+    product_detail: {
+      product: {
+        name: string;
+      };
+    };
     quantity: number;
-    price: number;
+    unit_price: number;
   }>;
 }
 
@@ -206,7 +211,7 @@ const OrderHistory: React.FC = () => {
                 <div className="mb-4 py-4 border-t border-b border-gray-200">
                   {Array.isArray(order.order_details) && order.order_details.slice(0, 2).map((detail, index) => (
                     <p key={index} className="text-sm text-gray-600">
-                      • {detail.product?.name} × {detail.quantity}
+                      • {detail.product_detail?.product?.name || 'Produk'} × {detail.quantity}
                     </p>
                   ))}
                   {Array.isArray(order.order_details) && order.order_details.length > 2 && (
@@ -270,10 +275,10 @@ const OrderHistory: React.FC = () => {
                   {Array.isArray(selectedOrder.order_details) && selectedOrder.order_details.map((detail, index) => (
                     <div key={index} className="flex justify-between text-sm">
                       <span className="text-gray-700">
-                        {detail.product?.name} × {detail.quantity}
+                        {detail.product_detail?.product?.name || 'Produk'} × {detail.quantity}
                       </span>
                       <span className="font-medium">
-                        {formatCurrency(detail.price * detail.quantity)}
+                        {formatCurrency(detail.unit_price * detail.quantity)}
                       </span>
                     </div>
                   ))}
@@ -299,7 +304,7 @@ const OrderHistory: React.FC = () => {
                 <div>
                   <h4 className="font-semibold text-gray-900 mb-2">Bukti Pembayaran</h4>
                   <img
-                    src={selectedOrder.payment_proof}
+                    src={selectedOrder.payment_proof_url || ''}
                     alt="Bukti Pembayaran"
                     className="rounded-lg max-h-64"
                   />

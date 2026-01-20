@@ -147,6 +147,10 @@ const Checkout: React.FC = () => {
         formData.append('shipping_rate_id', selectedRate.id.toString());
       }
 
+      // Add selected cart item IDs
+      const selectedIds = cartItems.map(item => item.id);
+      formData.append('selected_ids', JSON.stringify(selectedIds));
+
       await apiClient.post('/orders', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',

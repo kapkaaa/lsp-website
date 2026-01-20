@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
+use App\Models\Order;
 use App\Models\OrderDetail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -16,8 +17,8 @@ class OrderController extends Controller
     {
         $user = $request->user();
         
-        $orders = Order::where('user_id', $user->id)
-            ->with(['orderDetails', 'payment'])
+        $orders = Order::where('buyer_id', $user->id)
+            ->with(['orderDetails.product_detail.product', 'payment'])
             ->orderBy('created_at', 'desc')
             ->paginate(10);
 
@@ -33,59 +34,102 @@ class OrderController extends Controller
     public function store(Request $request)
     {
         $request->validate([
+            'destination_city' => 'required|string',
             'shipping_address' => 'required|string',
-            'shipping_method' => 'required|string',
             'payment_method' => 'required|string',
+            'shipping_rate_id' => 'required|exists:shipping_rates,id',
+            'payment_proof' => 'required|image|mimes:jpeg,png,jpg|max:5120',
         ]);
 
         $user = $request->user();
         
-        // Get user's cart items
-        $cartItems = $user->cartItems()->with('productDetail')->get();
+        // Get selected item IDs from session/request if provided, else take all from cart
+        $selectedIds = json_decode($request->input('selected_ids', '[]'), true);
+        
+        $query = $user->cartItems()->with('productDetail');
+        if (!empty($selectedIds)) {
+            $query->whereIn('id', $selectedIds);
+        }
+        
+        $cartItems = $query->get();
         
         if ($cartItems->isEmpty()) {
             return response()->json([
-                'message' => 'Cannot create order: Cart is empty'
+                'message' => 'Cannot create order: No items selected or cart is empty'
             ], 400);
         }
 
-        // Calculate total amount
-        $totalAmount = $cartItems->sum(function ($item) {
-            return $item->quantity * $item->productDetail->price;
+        // Calculate totals
+        $subtotal = $cartItems->sum(function ($item) {
+            return $item->quantity * ($item->productDetail->product->selling_price ?? 0);
         });
 
-        // Create order
-        $order = Order::create([
-            'user_id' => $user->id,
-            'total_amount' => $totalAmount,
-            'shipping_address' => $request->shipping_address,
-            'shipping_method' => $request->shipping_method,
-            'payment_method' => $request->payment_method,
-            'status' => 'pending' // Default status
-        ]);
+        $shippingRate = \App\Models\ShippingRate::findOrFail($request->shipping_rate_id);
+        $totalQuantity = $cartItems->sum('quantity');
+        $weight = ceil($totalQuantity / 3);
+        $shippingCost = $weight * $shippingRate->price_per_kg;
+        $totalPayment = $subtotal + $shippingCost;
 
-        // Create order details
-        foreach ($cartItems as $cartItem) {
-            OrderDetail::create([
-                'order_id' => $order->id,
-                'product_detail_id' => $cartItem->product_detail_id,
-                'quantity' => $cartItem->quantity,
-                'unit_price' => $cartItem->productDetail->price,
-                'total' => $cartItem->quantity * $cartItem->productDetail->price
+        try {
+            \Illuminate\Support\Facades\DB::beginTransaction();
+
+            // Handle payment proof upload to Supabase
+            $path = $request->file('payment_proof')->store('payments', 'supabase');
+
+            // Create order with new model structure
+            $order = Order::create([
+                'buyer_id' => $user->id,
+                'shipping_rate_id' => $request->shipping_rate_id,
+                'order_code' => Order::generateOrderCode(),
+                'subtotal' => $subtotal,
+                'weight' => $weight,
+                'shipping_cost' => $shippingCost,
+                'total_payment' => $totalPayment,
+                'destination_city' => $request->destination_city,
+                'payment_proof' => $path,
+                'payment_status' => 'pending',
+                'order_status' => 'pending',
+                'payment_method' => $request->payment_method
             ]);
 
-            // Reduce stock
-            $productDetail = $cartItem->productDetail;
-            $productDetail->increment('stock', -$cartItem->quantity); // Safer way or update directly
+            // Create order details and reduce stock
+            foreach ($cartItems as $cartItem) {
+                OrderDetail::create([
+                    'order_id' => $order->id,
+                    'product_detail_id' => $cartItem->product_detail_id,
+                    'quantity' => $cartItem->quantity,
+                    'unit_price' => $cartItem->productDetail->product->selling_price ?? 0,
+                    'total' => $cartItem->quantity * ($cartItem->productDetail->product->selling_price ?? 0)
+                ]);
+
+                // Reduce stock
+                $productDetail = $cartItem->productDetail;
+                if ($productDetail) {
+                    $productDetail->decrement('stock', $cartItem->quantity);
+                }
+            }
+
+            // Clear ONLY selected cart items
+            if (!empty($selectedIds)) {
+                $user->cartItems()->whereIn('id', $selectedIds)->delete();
+            } else {
+                $user->cartItems()->delete();
+            }
+
+            \Illuminate\Support\Facades\DB::commit();
+
+            return response()->json([
+                'data' => $order->load('orderDetails'),
+                'message' => 'Order created successfully'
+            ], 201);
+
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\DB::rollBack();
+            \Log::error('Order creation failed:', ['error' => $e->getMessage()]);
+            return response()->json([
+                'message' => 'Failed to create order: ' . $e->getMessage()
+            ], 500);
         }
-
-        // Clear user's cart
-        $user->cartItems()->delete();
-
-        return response()->json([
-            'data' => $order->load('orderDetails'),
-            'message' => 'Order created successfully'
-        ], 201);
     }
 
     /**
@@ -96,8 +140,8 @@ class OrderController extends Controller
         $user = $request->user();
         
         $order = Order::where('id', $id)
-            ->where('user_id', $user->id)
-            ->with(['orderDetails', 'payment'])
+            ->where('buyer_id', $user->id)
+            ->with(['orderDetails.product_detail.product', 'payment'])
             ->firstOrFail();
 
         return response()->json([

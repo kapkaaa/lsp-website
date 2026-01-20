@@ -23,6 +23,8 @@ class Order extends Model
         'payment_method'
     ];
 
+    protected $appends = ['payment_proof_url'];
+
     protected $casts = [
         'subtotal' => 'integer',
         'weight' => 'integer',
