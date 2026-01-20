@@ -33,19 +33,21 @@ interface CartItem {
 
 const Cart: React.FC = () => {
   const navigate = useNavigate();
-  const { user } = useUser();
+  const { user, isLoading } = useUser();
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [updating, setUpdating] = useState<number | null>(null);
   const [selectedItems, setSelectedItems] = useState<Set<number>>(new Set());
 
   useEffect(() => {
-    if (!user) {
-      navigate('/login');
-      return;
+    if (!isLoading) {
+      if (!user) {
+        navigate('/login');
+        return;
+      }
+      fetchCart();
     }
-    fetchCart();
-  }, [user]);
+  }, [user, isLoading]);
 
   // Auto-select all items when cart is loaded
   useEffect(() => {
@@ -136,7 +138,7 @@ const Cart: React.FC = () => {
     }
   };
 
-  if (loading) {
+  if (loading || isLoading) {
     return <Loading text="Memuat keranjang..." />;
   }
 
@@ -307,7 +309,7 @@ const Cart: React.FC = () => {
                     <span>Subtotal ({totalSelectedItems} item)</span>
                     <span className="font-semibold">{formatCurrency(subtotal)}</span>
                   </div>
-                  
+
                   <div className="flex justify-between text-sm text-gray-500">
                     <span>Ongkos Kirim</span>
                     <span>Dihitung di checkout</span>

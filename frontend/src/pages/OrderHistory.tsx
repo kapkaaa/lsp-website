@@ -36,7 +36,7 @@ interface Order {
 
 const OrderHistory: React.FC = () => {
   const navigate = useNavigate();
-  const { user } = useUser();
+  const { user, isLoading } = useUser();
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<string>('all');
@@ -44,12 +44,14 @@ const OrderHistory: React.FC = () => {
   const [showModal, setShowModal] = useState(false);
 
   useEffect(() => {
-    if (!user) {
-      navigate('/login');
-      return;
+    if (!isLoading) {
+      if (!user) {
+        navigate('/login');
+        return;
+      }
+      fetchOrders();
     }
-    fetchOrders();
-  }, [user]);
+  }, [user, isLoading]);
 
   const fetchOrders = async () => {
     try {
@@ -87,7 +89,7 @@ const OrderHistory: React.FC = () => {
     ? orders
     : orders.filter(order => order.order_status === filter);
 
-  if (loading) {
+  if (loading || isLoading) {
     return <Loading text="Memuat riwayat pesanan..." />;
   }
 

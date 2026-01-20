@@ -44,7 +44,7 @@ const REGIONS = [
 
 const Checkout: React.FC = () => {
   const navigate = useNavigate();
-  const { user } = useUser();
+  const { user, isLoading } = useUser();
 
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [shippingRates, setShippingRates] = useState<ShippingRate[]>([]);
@@ -59,12 +59,14 @@ const Checkout: React.FC = () => {
   const [previewUrl, setPreviewUrl] = useState<string>('');
 
   useEffect(() => {
-    if (!user) {
-      navigate('/login');
-      return;
+    if (!isLoading) {
+      if (!user) {
+        navigate('/login');
+        return;
+      }
+      fetchCheckoutData();
     }
-    fetchCheckoutData();
-  }, [user]);
+  }, [user, isLoading]);
 
   const fetchCheckoutData = async () => {
     try {
@@ -153,7 +155,7 @@ const Checkout: React.FC = () => {
     }
   };
 
-  if (loading) {
+  if (loading || isLoading) {
     return <Loading text="Memuat checkout..." />;
   }
 

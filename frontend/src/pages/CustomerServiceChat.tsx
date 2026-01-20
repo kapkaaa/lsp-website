@@ -7,6 +7,7 @@ import {
 import apiClient from '../services/apiClient';
 import Button from '../components/Button';
 import { formatTime } from '../utils/formatters';
+import Loading from '../components/Loading';
 import { useUser } from '../contexts/UserContext';
 
 interface Message {
@@ -18,27 +19,30 @@ interface Message {
 
 const CustomerServiceChat: React.FC = () => {
   const navigate = useNavigate();
-  const { user } = useUser();
+  const { user, isLoading } = useUser();
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState('');
   const [sending, setSending] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [isOperationalHours, setIsOperationalHours] = useState(true);
 
   useEffect(() => {
-    if (!user) {
-      navigate('/login');
-      return;
+    if (!isLoading) {
+      if (!user) {
+        navigate('/login');
+        return;
+      }
+
+      checkOperationalHours();
+      fetchMessages();
+
+      // Poll for new messages every 5 seconds
+      const interval = setInterval(fetchMessages, 5000);
+      return () => clearInterval(interval);
     }
-
-    checkOperationalHours();
-    fetchMessages();
-
-    // Poll for new messages every 5 seconds
-    const interval = setInterval(fetchMessages, 5000);
-    return () => clearInterval(interval);
-  }, [user]);
+  }, [user, isLoading]);
 
   useEffect(() => {
     scrollToBottom();
@@ -58,7 +62,13 @@ const CustomerServiceChat: React.FC = () => {
       setMessages(response.data.data || []);
     } catch (error) {
       console.error('Failed to fetch messages:', error);
+    } finally {
+      setLoading(false);
     }
+  };
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
   const handleSendMessage = async (e: React.FormEvent) => {
@@ -81,9 +91,9 @@ const CustomerServiceChat: React.FC = () => {
     }
   };
 
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  };
+  if (loading || isLoading) {
+    return <Loading text="Memuat percakapan..." />;
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
