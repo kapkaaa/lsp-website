@@ -37,6 +37,7 @@ const Cart: React.FC = () => {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [updating, setUpdating] = useState<number | null>(null);
+  const [selectedItems, setSelectedItems] = useState<Set<number>>(new Set());
 
   useEffect(() => {
     if (!user) {
@@ -45,6 +46,13 @@ const Cart: React.FC = () => {
     }
     fetchCart();
   }, [user]);
+
+  // Auto-select all items when cart is loaded
+  useEffect(() => {
+    if (cartItems.length > 0) {
+      setSelectedItems(new Set(cartItems.map(item => item.id)));
+    }
+  }, [cartItems]);
 
   const fetchCart = async () => {
     try {
@@ -57,6 +65,28 @@ const Cart: React.FC = () => {
       setLoading(false);
     }
   };
+
+  const toggleSelectItem = (itemId: number) => {
+    setSelectedItems(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(itemId)) {
+        newSet.delete(itemId);
+      } else {
+        newSet.add(itemId);
+      }
+      return newSet;
+    });
+  };
+
+  const toggleSelectAll = () => {
+    if (selectedItems.size === cartItems.length) {
+      setSelectedItems(new Set());
+    } else {
+      setSelectedItems(new Set(cartItems.map(item => item.id)));
+    }
+  };
+
+  const isAllSelected = cartItems.length > 0 && selectedItems.size === cartItems.length;
 
   const updateQuantity = async (itemId: number, newQuantity: number) => {
     const item = cartItems.find(i => i.id === itemId);
@@ -93,6 +123,11 @@ const Cart: React.FC = () => {
     try {
       await apiClient.delete(`/cart/${itemId}`);
       setCartItems(cartItems.filter(i => i.id !== itemId));
+      setSelectedItems(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(itemId);
+        return newSet;
+      });
     } catch (error) {
       console.error('Failed to remove item:', error);
       alert('Gagal menghapus item');
@@ -105,12 +140,13 @@ const Cart: React.FC = () => {
     return <Loading text="Memuat keranjang..." />;
   }
 
-  const subtotal = cartItems.reduce(
+  // Calculate subtotal only for selected items
+  const selectedCartItems = cartItems.filter(item => selectedItems.has(item.id));
+  const subtotal = selectedCartItems.reduce(
     (sum, item) => sum + (item.product_detail?.product?.selling_price || 0) * item.quantity,
     0
   );
-
-  const totalItems = cartItems.reduce((sum, item) => sum + item.quantity, 0);
+  const totalSelectedItems = selectedCartItems.reduce((sum, item) => sum + item.quantity, 0);
 
   return (
     <div className="min-h-screen bg-gray-50 py-8">
@@ -121,7 +157,7 @@ const Cart: React.FC = () => {
             Keranjang Belanja
           </h1>
           <p className="text-gray-600">
-            {totalItems} item dalam keranjang Anda
+            {cartItems.length} item dalam keranjang Anda
           </p>
         </div>
 
@@ -145,18 +181,46 @@ const Cart: React.FC = () => {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Cart Items */}
             <div className="lg:col-span-2 space-y-4">
+              {/* Select All Header */}
+              <div className="bg-white rounded-xl shadow-sm p-4 flex items-center gap-4">
+                <label className="flex items-center gap-3 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={isAllSelected}
+                    onChange={toggleSelectAll}
+                    className="w-5 h-5 rounded border-gray-300 text-cyan-600 focus:ring-cyan-500 cursor-pointer"
+                  />
+                  <span className="font-medium text-gray-900">
+                    Pilih Semua ({cartItems.length} item)
+                  </span>
+                </label>
+                <span className="ml-auto text-sm text-gray-500">
+                  {selectedItems.size} item dipilih
+                </span>
+              </div>
+
               {cartItems.map((item) => (
                 <div
                   key={item.id}
-                  className="bg-white rounded-xl shadow-sm p-6 animate-fade-in"
+                  className={`bg-white rounded-xl shadow-sm p-6 animate-fade-in transition-all ${selectedItems.has(item.id) ? 'ring-2 ring-cyan-500' : ''}`}
                 >
-                  <div className="flex gap-6">
+                  <div className="flex gap-4">
+                    {/* Checkbox */}
+                    <div className="flex items-start pt-1">
+                      <input
+                        type="checkbox"
+                        checked={selectedItems.has(item.id)}
+                        onChange={() => toggleSelectItem(item.id)}
+                        className="w-5 h-5 rounded border-gray-300 text-cyan-600 focus:ring-cyan-500 cursor-pointer"
+                      />
+                    </div>
+
                     {/* Product Image */}
                     <div className="flex-shrink-0">
                       <img
                         src={item.product_detail?.photos?.[0]?.photo_url || '/placeholder-tshirt.jpg'}
                         alt={item.product_detail?.product?.name}
-                        className="w-32 h-32 object-cover rounded-lg"
+                        className="w-28 h-28 object-cover rounded-lg"
                       />
                     </div>
 
@@ -240,9 +304,10 @@ const Cart: React.FC = () => {
 
                 <div className="space-y-4 mb-6">
                   <div className="flex justify-between text-gray-600">
-                    <span>Subtotal ({totalItems} item)</span>
+                    <span>Subtotal ({totalSelectedItems} item)</span>
                     <span className="font-semibold">{formatCurrency(subtotal)}</span>
                   </div>
+                  
                   <div className="flex justify-between text-sm text-gray-500">
                     <span>Ongkos Kirim</span>
                     <span>Dihitung di checkout</span>
@@ -260,12 +325,17 @@ const Cart: React.FC = () => {
                 </div>
 
                 <Button
-                  onClick={() => navigate('/checkout')}
+                  onClick={() => {
+                    // Save selected items to sessionStorage for checkout
+                    sessionStorage.setItem('selectedCartItems', JSON.stringify(Array.from(selectedItems)));
+                    navigate('/checkout');
+                  }}
                   variant="primary"
                   className="w-full mb-3"
                   size="lg"
+                  disabled={selectedItems.size === 0}
                 >
-                  Lanjut ke Checkout
+                  Lanjut ke Checkout ({selectedItems.size})
                 </Button>
 
                 <Button
