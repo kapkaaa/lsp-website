@@ -7,6 +7,7 @@ import {
   ShieldCheckIcon,
   MinusIcon,
   PlusIcon,
+  BoltIcon,
 } from '@heroicons/react/24/outline';
 import { HeartIcon as HeartSolidIcon } from '@heroicons/react/24/solid';
 import apiClient from '../services/apiClient';
@@ -49,6 +50,7 @@ const ProductDetailPage: React.FC = () => {
   const [isFavorite, setIsFavorite] = useState(false);
   const [addingToCart, setAddingToCart] = useState(false);
   const [addToCartSuccess, setAddToCartSuccess] = useState(false);
+  const [buyingNow, setBuyingNow] = useState(false);
 
   useEffect(() => {
     fetchProduct();
@@ -118,6 +120,52 @@ const ProductDetailPage: React.FC = () => {
       alert('Gagal menambahkan ke keranjang');
     } finally {
       setAddingToCart(false);
+    }
+  };
+
+  const handleBuyNow = async () => {
+    if (!user) {
+      navigate('/login');
+      return;
+    }
+
+    if (!selectedColor || !selectedSize) {
+      alert('Pilih warna dan ukuran terlebih dahulu');
+      return;
+    }
+
+    // Find the selected product detail
+    const selectedDetail = product?.product_details?.find(
+      (d) => d.color?.id === selectedColor && d.size?.id === selectedSize
+    );
+
+    if (!selectedDetail) {
+      alert('Varian yang dipilih tidak tersedia');
+      return;
+    }
+
+    if (quantity > selectedDetail.stock) {
+      alert(`Stok hanya tersedia ${selectedDetail.stock} pcs`);
+      return;
+    }
+
+    setBuyingNow(true);
+    try {
+      // Add to cart first
+      await apiClient.post('/cart', {
+        product_detail_id: selectedDetail.id,
+        quantity: quantity,
+      });
+
+      // Refresh cart and navigate to checkout
+      await refreshCart();
+
+      // Navigate directly to checkout
+      navigate('/checkout');
+    } catch (error) {
+      console.error('Failed to process buy now:', error);
+      alert('Gagal memproses pembelian');
+      setBuyingNow(false);
     }
   };
 
@@ -339,9 +387,9 @@ const ProductDetailPage: React.FC = () => {
             <div className="flex gap-3 pt-4">
               <Button
                 onClick={handleAddToCart}
-                variant={addToCartSuccess ? 'secondary' : 'primary'}
+                variant={addToCartSuccess ? 'secondary' : 'outline'}
                 size="lg"
-                className={`flex-1 transition-all duration-300 ${addToCartSuccess ? 'bg-green-500 hover:bg-green-600 text-white animate-add-to-cart-success' : ''}`}
+                className={`flex-1 transition-all duration-300 ${addToCartSuccess ? 'bg-green-500 hover:bg-green-600 text-white border-green-500 animate-add-to-cart-success' : ''}`}
                 loading={addingToCart}
                 disabled={!selectedColor || !selectedSize || currentStock === 0 || addToCartSuccess}
               >
@@ -360,8 +408,24 @@ const ProductDetailPage: React.FC = () => {
                 )}
               </Button>
               <Button
-                variant="outline"
+                onClick={handleBuyNow}
+                variant="primary"
                 size="lg"
+                className="flex-1"
+                loading={buyingNow}
+                disabled={!selectedColor || !selectedSize || currentStock === 0 || buyingNow}
+              >
+                <BoltIcon className="h-5 w-5" />
+                Beli Sekarang
+              </Button>
+            </div>
+
+            {/* Ask CS Button */}
+            <div className="pt-2">
+              <Button
+                variant="secondary"
+                size="lg"
+                className="w-full bg-white hover:bg-gray-50 text-gray-700 border-0 shadow-md hover:shadow-lg"
                 onClick={() => navigate('/chat')}
               >
                 Tanya CS
