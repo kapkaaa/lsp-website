@@ -120,16 +120,9 @@ class Order extends Model
     public function getPaymentProofUrlAttribute()
     {
         if ($this->payment_proof && !str_starts_with($this->payment_proof, 'http')) {
-            try {
-                // Check if the file exists on the supabase disk and generate the appropriate URL
-                if (\Illuminate\Support\Facades\Storage::disk('supabase')->exists($this->payment_proof)) {
-                    return \Illuminate\Support\Facades\Storage::disk('supabase')->url($this->payment_proof);
-                }
-            } catch (\Exception $e) {
-                \Log::error('Error getting payment proof URL from Supabase:', ['error' => $e->getMessage(), 'payment_proof' => $this->payment_proof]);
-            }
-            // Fallback to default disk
-            return \Illuminate\Support\Facades\Storage::disk()->url($this->payment_proof);
+            // Use the supabase disk to generate the URL directly
+            // Removed exists() check as it causes slow network calls during JSON serialization
+            return \Illuminate\Support\Facades\Storage::disk('supabase')->url($this->payment_proof);
         }
         return $this->payment_proof;
     }

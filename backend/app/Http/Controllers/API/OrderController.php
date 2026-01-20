@@ -149,4 +149,52 @@ class OrderController extends Controller
             'message' => 'Order retrieved successfully'
         ]);
     }
+
+    public function cancel(Request $request, $id)
+    {
+        $user = $request->user();
+        
+        $order = Order::where('id', $id)
+            ->where('buyer_id', $user->id)
+            ->with('orderDetails.product_detail')
+            ->firstOrFail();
+
+        if (!$order->isPending()) {
+            return response()->json([
+                'message' => 'Hanya pesanan berstatus pending yang dapat dibatalkan'
+            ], 400);
+        }
+
+        try {
+            \Illuminate\Support\Facades\DB::beginTransaction();
+
+            // Restore stock
+            foreach ($order->orderDetails as $detail) {
+                $productDetail = $detail->product_detail;
+                if ($productDetail) {
+                    $productDetail->increment('stock', $detail->quantity);
+                }
+            }
+
+            // Update status
+            $order->update([
+                'order_status' => 'cancelled',
+                'payment_status' => 'cancelled'
+            ]);
+
+            \Illuminate\Support\Facades\DB::commit();
+
+            return response()->json([
+                'message' => 'Pesanan berhasil dibatalkan dan stok telah dikembalikan',
+                'data' => $order
+            ]);
+
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\DB::rollBack();
+            \Log::error('Order cancellation failed:', ['error' => $e->getMessage()]);
+            return response()->json([
+                'message' => 'Gagal membatalkan pesanan: ' . $e->getMessage()
+            ], 500);
+        }
+    }
 }

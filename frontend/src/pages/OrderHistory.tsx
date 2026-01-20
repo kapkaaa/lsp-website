@@ -47,6 +47,8 @@ const OrderHistory: React.FC = () => {
   const [filter, setFilter] = useState<string>('all');
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [showModal, setShowModal] = useState(false);
+  const [showCancelModal, setShowCancelModal] = useState(false);
+  const [canceling, setCanceling] = useState(false);
 
   useEffect(() => {
     if (!isLoading) {
@@ -67,6 +69,24 @@ const OrderHistory: React.FC = () => {
       console.error('Failed to fetch orders:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleCancelOrder = async () => {
+    if (!selectedOrder) return;
+
+    setCanceling(true);
+    try {
+      await apiClient.post(`/orders/${selectedOrder.id}/cancel`);
+      alert('Pesanan berhasil dibatalkan');
+      setShowCancelModal(false);
+      setSelectedOrder(null);
+      fetchOrders();
+    } catch (error) {
+      console.error('Failed to cancel order:', error);
+      alert('Gagal membatalkan pesanan. Silakan coba lagi.');
+    } finally {
+      setCanceling(false);
     }
   };
 
@@ -159,6 +179,15 @@ const OrderHistory: React.FC = () => {
             >
               Selesai
             </button>
+            <button
+              onClick={() => setFilter('cancelled')}
+              className={`px-4 py-2 rounded-lg font-medium transition-colors ${filter === 'cancelled'
+                ? 'bg-cyan-500 text-white'
+                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                }`}
+            >
+              Dibatalkan
+            </button>
           </div>
         </div>
 
@@ -232,6 +261,21 @@ const OrderHistory: React.FC = () => {
                   >
                     Lihat Detail
                   </Button>
+
+                  {order.order_status === 'pending' && (
+                    <Button
+                      onClick={() => {
+                        setSelectedOrder(order);
+                        setShowCancelModal(true);
+                      }}
+                      variant="outline"
+                      size="sm"
+                      className="text-red-600 border-red-200 hover:bg-red-50"
+                    >
+                      <XCircleIcon className="h-4 w-4" />
+                      Batalkan Pesanan
+                    </Button>
+                  )}
 
                   {order.order_status === 'pending' && !order.payment_proof && (
                     <Button variant="primary" size="sm">
@@ -312,6 +356,42 @@ const OrderHistory: React.FC = () => {
               )}
             </div>
           )}
+        </Modal>
+
+        {/* Cancel Confirmation Modal */}
+        <Modal
+          isOpen={showCancelModal}
+          onClose={() => !canceling && setShowCancelModal(false)}
+          title="Konfirmasi Pembatalan"
+          size="sm"
+        >
+          <div className="text-center">
+            <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <XCircleIcon className="h-8 w-8 text-red-600" />
+            </div>
+            <h3 className="text-lg font-bold text-gray-900 mb-2">Batalkan Pesanan?</h3>
+            <p className="text-sm text-gray-600 mb-6">
+              Apakah Anda yakin ingin membatalkan pesanan <span className="font-semibold">{selectedOrder?.order_code}</span>?
+              Tindakan ini tidak dapat dibatalkan dan stok produk akan dikembalikan.
+            </p>
+            <div className="grid grid-cols-2 gap-3">
+              <Button
+                variant="outline"
+                onClick={() => setShowCancelModal(false)}
+                disabled={canceling}
+              >
+                Batal
+              </Button>
+              <Button
+                variant="primary"
+                className="bg-red-600 hover:bg-red-700 border-red-600"
+                onClick={handleCancelOrder}
+                loading={canceling}
+              >
+                Ya, Batalkan
+              </Button>
+            </div>
+          </div>
         </Modal>
       </div>
     </div>
