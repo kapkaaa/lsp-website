@@ -31,16 +31,7 @@ interface ShippingRate {
   price_per_kg: number;
 }
 
-const REGIONS = [
-  'Jakarta',
-  'Depok',
-  'Bekasi',
-  'Tangerang',
-  'Bogor',
-  'Seluruh Wilayah Jawa Barat',
-  'Seluruh Wilayah Jawa Tengah',
-  'Seluruh Wilayah Jawa Timur',
-];
+// Hardcoded regions removed. Now using dynamic data from shippingRates API.
 
 const Checkout: React.FC = () => {
   const navigate = useNavigate();
@@ -77,19 +68,27 @@ const Checkout: React.FC = () => {
       ]);
 
       const data = cartResponse.data.data;
-      setCartItems(Array.isArray(data) ? data : (data?.items || []));
+      const allItems = Array.isArray(data) ? data : (data?.items || []);
 
-      // If backend doesn't provide rates, use hardcoded data
+      // Filter items based on selection from cart page
+      const selectedIds = JSON.parse(sessionStorage.getItem('selectedCartItems') || '[]');
+      if (selectedIds.length > 0) {
+        setCartItems(allItems.filter((item: any) => selectedIds.includes(item.id)));
+      } else {
+        setCartItems(allItems); // Fallback to all items if no selection found
+      }
+
+      // If backend doesn't provide rates, use hardcoded data (matched with seeder)
       if (ratesResponse.data.data.length === 0) {
         setShippingRates([
-          { id: 1, region: 'Jakarta', price_per_kg: 24000 },
-          { id: 2, region: 'Depok', price_per_kg: 24000 },
-          { id: 3, region: 'Bekasi', price_per_kg: 25000 },
-          { id: 4, region: 'Tangerang', price_per_kg: 25000 },
-          { id: 5, region: 'Bogor', price_per_kg: 27000 },
-          { id: 6, region: 'Seluruh Wilayah Jawa Barat', price_per_kg: 31000 },
-          { id: 7, region: 'Seluruh Wilayah Jawa Tengah', price_per_kg: 39000 },
-          { id: 8, region: 'Seluruh Wilayah Jawa Timur', price_per_kg: 47000 },
+          { id: 1, region: 'Jakarta', price_per_kg: 10000 },
+          { id: 3, region: 'Depok', price_per_kg: 24000 },
+          { id: 4, region: 'Bekasi', price_per_kg: 25000 },
+          { id: 5, region: 'Tangerang', price_per_kg: 25000 },
+          { id: 6, region: 'Bogor', price_per_kg: 27000 },
+          { id: 7, region: 'Jawa Barat', price_per_kg: 31000 },
+          { id: 8, region: 'Jawa Tengah', price_per_kg: 39000 },
+          { id: 9, region: 'Jawa Timur', price_per_kg: 47000 },
         ]);
       } else {
         setShippingRates(ratesResponse.data.data);
@@ -216,9 +215,9 @@ const Checkout: React.FC = () => {
                       required
                     >
                       <option value="">Pilih Wilayah</option>
-                      {REGIONS.map((region) => (
-                        <option key={region} value={region}>
-                          {region}
+                      {shippingRates.map((rate) => (
+                        <option key={rate.id} value={rate.region}>
+                          {rate.region}
                         </option>
                       ))}
                     </select>
