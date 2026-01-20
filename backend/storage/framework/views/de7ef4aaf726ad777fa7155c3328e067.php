@@ -2,6 +2,10 @@
     <link rel="icon" type="image/png" href="<?php echo e(asset('logo.png')); ?>">
 <?php $__env->stopSection(); ?>
 
+<?php $__env->startSection('meta_tags'); ?>
+    <link rel="icon" type="image/png" href="<?php echo e(asset('logo.png')); ?>">
+<?php $__env->stopSection(); ?>
+
 <?php $__env->startSection('title', config('app.name')); ?>
 
 <?php $__env->startSection('content_header'); ?>
