@@ -6,7 +6,9 @@ import {
   TruckIcon,
   PhotoIcon,
   CheckCircleIcon,
+  DocumentDuplicateIcon as ClipboardIcon,
 } from '@heroicons/react/24/outline';
+import Modal from '../components/Modal';
 import apiClient from '../services/apiClient';
 import Loading from '../components/Loading';
 import Button from '../components/Button';
@@ -46,6 +48,8 @@ const Checkout: React.FC = () => {
   const [destinationCity, setDestinationCity] = useState('');
   const [address, setAddress] = useState('');
   const [paymentMethod, setPaymentMethod] = useState('transfer');
+  const [selectedBank, setSelectedBank] = useState<'bca' | 'mandiri' | null>(null);
+  const [showQrisModal, setShowQrisModal] = useState(false);
   const [paymentProof, setPaymentProof] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string>('');
 
@@ -98,6 +102,11 @@ const Checkout: React.FC = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const copyToClipboard = (text: string) => {
+    navigator.clipboard.writeText(text);
+    alert('Nomor rekening berhasil disalin!');
   };
 
   const handlePaymentProofChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -312,6 +321,74 @@ const Checkout: React.FC = () => {
                   </label>
                 </div>
 
+                {/* Bank Transfer Details */}
+                {paymentMethod === 'transfer' && (
+                  <div className="mt-6 space-y-4 animate-fade-in">
+                    <p className="text-sm font-medium text-gray-700">Pilih Rekening Bank:</p>
+                    <div className="grid grid-cols-2 gap-4">
+                      <button
+                        type="button"
+                        onClick={() => setSelectedBank('bca')}
+                        className={`p-4 border-2 rounded-xl text-center transition-all ${selectedBank === 'bca'
+                          ? 'border-cyan-500 bg-cyan-50'
+                          : 'border-gray-100 hover:border-gray-200'
+                          }`}
+                      >
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/5/5c/Bank_Central_Asia.svg" alt="BCA" className="h-6 mx-auto mb-2" />
+                        <span className="text-sm font-semibold">BCA</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setSelectedBank('mandiri')}
+                        className={`p-4 border-2 rounded-xl text-center transition-all ${selectedBank === 'mandiri'
+                          ? 'border-cyan-500 bg-cyan-50'
+                          : 'border-gray-100 hover:border-gray-200'
+                          }`}
+                      >
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/a/ad/Bank_Mandiri_logo_2016.svg" alt="Mandiri" className="h-6 mx-auto mb-2" />
+                        <span className="text-sm font-semibold">Mandiri</span>
+                      </button>
+                    </div>
+
+                    {selectedBank && (
+                      <div className="bg-gray-50 rounded-xl p-4 border border-gray-200 animate-fade-in">
+                        <div className="flex justify-between items-start">
+                          <div>
+                            <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">Nomor Rekening</p>
+                            <p className="text-lg font-bold text-gray-900 font-mono">
+                              {selectedBank === 'bca' ? '1234567890' : '0987654321'}
+                            </p>
+                            <p className="text-sm text-gray-600 mt-1">a/n DistroZone Admin</p>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => copyToClipboard(selectedBank === 'bca' ? '1234567890' : '0987654321')}
+                            className="p-2 text-cyan-600 hover:bg-cyan-50 rounded-lg transition-colors"
+                            title="Salin No. Rekening"
+                          >
+                            <ClipboardIcon className="h-5 w-5" />
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* QRIS Logic */}
+                {paymentMethod === 'qris' && (
+                  <div className="mt-6 animate-fade-in">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className="w-full"
+                      onClick={() => setShowQrisModal(true)}
+                    >
+                      <PhotoIcon className="h-5 w-5" />
+                      Lihat Kode QRIS
+                    </Button>
+                  </div>
+                )}
+
                 {/* Payment Info */}
                 <div className="mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
                   <p className="text-sm text-yellow-800 font-medium mb-2">
@@ -409,7 +486,12 @@ const Checkout: React.FC = () => {
                   className="w-full mt-6"
                   size="lg"
                   loading={submitting}
-                  disabled={!destinationCity || !address || !paymentProof}
+                  disabled={
+                    !destinationCity ||
+                    !address ||
+                    !paymentProof ||
+                    (paymentMethod === 'transfer' && !selectedBank)
+                  }
                 >
                   <CheckCircleIcon className="h-5 w-5" />
                   Buat Pesanan
@@ -423,6 +505,39 @@ const Checkout: React.FC = () => {
           </div>
         </form>
       </div>
+
+      {/* QRIS Modal */}
+      <Modal
+        isOpen={showQrisModal}
+        onClose={() => setShowQrisModal(false)}
+        title="Pembayaran QRIS"
+        size="sm"
+      >
+        <div className="text-center">
+          <p className="text-sm text-gray-600 mb-4">
+            Silakan scan kode QR di bawah ini menggunakan aplikasi OVO, GoPay, Dana, atau Mobile Banking Anda.
+          </p>
+          <div className="bg-white p-4 rounded-2xl border-2 border-dashed border-gray-200 inline-block mb-4">
+            <img
+              src="/qris.jpeg"
+              alt="QRIS Code"
+              className="w-64 h-64 object-contain mx-auto"
+            />
+          </div>
+          <div className="bg-cyan-50 p-3 rounded-lg">
+            <p className="text-xs text-cyan-800 font-medium">
+              Pastikan nama merchant adalah <span className="font-bold">DistroZone</span>
+            </p>
+          </div>
+          <Button
+            variant="primary"
+            className="w-full mt-6"
+            onClick={() => setShowQrisModal(false)}
+          >
+            Tutup
+          </Button>
+        </div>
+      </Modal>
     </div>
   );
 };
