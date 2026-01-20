@@ -10,10 +10,12 @@ import {
   ClipboardDocumentListIcon,
 } from '@heroicons/react/24/outline';
 import { useUser } from '../contexts/UserContext';
+import { useCart } from '../contexts/CartContext';
 import Badge from './Badge';
 
 const Navbar: React.FC = () => {
   const { user, logout } = useUser();
+  const { cartCount, isAnimating } = useCart();
   const location = useLocation();
   const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -97,10 +99,14 @@ const Navbar: React.FC = () => {
                 >
                   <ShoppingCartIcon className="h-5 w-5" />
                   <span>Keranjang</span>
-                  {/* Cart badge - will be dynamic later */}
-                  <Badge variant="error" className="absolute -top-1 -right-1 px-2 py-0.5 text-xs">
-                    0
-                  </Badge>
+                  {cartCount > 0 && (
+                    <Badge
+                      variant="error"
+                      className={`absolute -top-1 -right-1 px-2 py-0.5 text-xs transition-transform ${isAnimating ? 'animate-cart-bounce' : ''}`}
+                    >
+                      {cartCount}
+                    </Badge>
+                  )}
                 </Link>
 
                 <Link

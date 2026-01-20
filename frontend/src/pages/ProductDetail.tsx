@@ -15,6 +15,7 @@ import Badge from '../components/Badge';
 import Button from '../components/Button';
 import { formatCurrency } from '../utils/formatters';
 import { useUser } from '../contexts/UserContext';
+import { useCart } from '../contexts/CartContext';
 
 interface ProductDetail {
   id: number;
@@ -37,6 +38,7 @@ const ProductDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { user } = useUser();
+  const { refreshCart, triggerAnimation } = useCart();
 
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
@@ -46,6 +48,7 @@ const ProductDetailPage: React.FC = () => {
   const [quantity, setQuantity] = useState(1);
   const [isFavorite, setIsFavorite] = useState(false);
   const [addingToCart, setAddingToCart] = useState(false);
+  const [addToCartSuccess, setAddToCartSuccess] = useState(false);
 
   useEffect(() => {
     fetchProduct();
@@ -102,7 +105,14 @@ const ProductDetailPage: React.FC = () => {
         product_detail_id: selectedDetail.id,
         quantity: quantity,
       });
-      alert('Produk berhasil ditambahkan ke keranjang!');
+
+      // Refresh cart count and trigger animation
+      await refreshCart();
+      triggerAnimation();
+
+      // Show success state on button
+      setAddToCartSuccess(true);
+      setTimeout(() => setAddToCartSuccess(false), 2000);
     } catch (error) {
       console.error('Failed to add to cart:', error);
       alert('Gagal menambahkan ke keranjang');
@@ -329,14 +339,25 @@ const ProductDetailPage: React.FC = () => {
             <div className="flex gap-3 pt-4">
               <Button
                 onClick={handleAddToCart}
-                variant="primary"
+                variant={addToCartSuccess ? 'secondary' : 'primary'}
                 size="lg"
-                className="flex-1"
+                className={`flex-1 transition-all duration-300 ${addToCartSuccess ? 'bg-green-500 hover:bg-green-600 text-white animate-add-to-cart-success' : ''}`}
                 loading={addingToCart}
-                disabled={!selectedColor || !selectedSize || currentStock === 0}
+                disabled={!selectedColor || !selectedSize || currentStock === 0 || addToCartSuccess}
               >
-                <ShoppingCartIcon className="h-5 w-5" />
-                Tambah ke Keranjang
+                {addToCartSuccess ? (
+                  <>
+                    <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                    Berhasil Ditambahkan!
+                  </>
+                ) : (
+                  <>
+                    <ShoppingCartIcon className="h-5 w-5" />
+                    Tambah ke Keranjang
+                  </>
+                )}
               </Button>
               <Button
                 variant="outline"
