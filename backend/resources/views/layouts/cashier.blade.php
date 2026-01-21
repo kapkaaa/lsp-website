@@ -22,6 +22,7 @@
     <!-- SweetAlert2 -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
 
+    @stack('css')
     @yield('css')
 </head>
 <body class="hold-transition sidebar-mini layout-fixed layout-navbar-fixed layout-footer-fixed">
@@ -109,12 +110,12 @@
                             <p>Online Orders</p>
                         </a>
                     </li>
-                    <!-- <li class="nav-item">
+                    <li class="nav-item">
                         <a href="{{ route('cashier.customer-service.index') }}" class="nav-link {{ request()->routeIs('cashier.customer-service.*') ? 'active' : '' }}">
                             <i class="nav-icon fas fa-comments"></i>
                             <p>Customer Service</p>
                         </a>
-                    </li> -->
+                    </li>
                 </ul>
             </nav>
         </div>
@@ -233,6 +234,7 @@
     }
 </script>
 
+@stack('js')
 @yield('js')
 </body>
 </html>
