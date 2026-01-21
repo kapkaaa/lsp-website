@@ -60,17 +60,17 @@ class OperationalHour extends Model
         // });
 
         if (!$operationalHour || $operationalHour->status === 'closed') {
-            return 'Layanan tutup hari ini';
+            return 'Layanan tutup saat ini. Buka kembali pada jam operasional';
         }
 
         if (self::isOperational($serviceType)) {
-            return 'Layanan buka: ' . 
-                   Carbon::parse($operationalHour->open_time)->format('H:i') . ' - ' . 
+            return 'Layanan buka: ' .
+                   Carbon::parse($operationalHour->open_time)->format('H:i') . ' - ' .
                    Carbon::parse($operationalHour->close_time)->format('H:i');
         }
 
-        return 'Layanan tutup. Buka jam: ' . 
-               Carbon::parse($operationalHour->open_time)->format('H:i') . ' - ' . 
+        return 'Layanan tutup saat ini, buka kembali pada ' .
+               Carbon::parse($operationalHour->open_time)->format('H:i') . ' - ' .
                Carbon::parse($operationalHour->close_time)->format('H:i');
     }
 

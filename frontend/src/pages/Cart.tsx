@@ -329,10 +329,29 @@ const Cart: React.FC = () => {
                 </div>
 
                 <Button
-                  onClick={() => {
-                    // Save selected items to sessionStorage for checkout
-                    sessionStorage.setItem('selectedCartItems', JSON.stringify(Array.from(selectedItems)));
-                    navigate('/checkout');
+                  onClick={async () => {
+                    // Check operational hours before proceeding to checkout
+                    try {
+                      const response = await apiClient.get('/operational-hours/status', {
+                        params: { service_type: 'online' }
+                      });
+
+                      const { is_operational, message } = response.data;
+
+                      if (!is_operational) {
+                        swal.warning('Toko Tutup', message);
+                        return;
+                      }
+
+                      // Save selected items to sessionStorage for checkout
+                      sessionStorage.setItem('selectedCartItems', JSON.stringify(Array.from(selectedItems)));
+                      navigate('/checkout');
+                    } catch (error) {
+                      console.error('Failed to check operational hours:', error);
+                      // If we can't check operational hours, allow checkout to proceed
+                      sessionStorage.setItem('selectedCartItems', JSON.stringify(Array.from(selectedItems)));
+                      navigate('/checkout');
+                    }
                   }}
                   variant="primary"
                   className="w-full mb-3"

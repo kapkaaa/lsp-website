@@ -6,6 +6,7 @@ use App\Http\Controllers\API\ProductController;
 use App\Http\Controllers\API\CartController;
 use App\Http\Controllers\API\OrderController;
 use App\Http\Controllers\API\ChatController;
+use App\Http\Controllers\API\OperationalHourController;
 
 /*
 |--------------------------------------------------------------------------
@@ -44,4 +45,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     // Chat routes
     Route::get('/chat/messages', [ChatController::class, 'getMessages']);
     Route::post('/chat/send', [ChatController::class, 'send']);
+
+    // Operational hours routes
+    Route::get('/operational-hours/status', [OperationalHourController::class, 'checkStatus']);
 });
