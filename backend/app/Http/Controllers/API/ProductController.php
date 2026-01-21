@@ -11,17 +11,34 @@ class ProductController extends Controller
     /**
      * Display a listing of the products.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $products = Product::with([
+        $query = Product::with([
             'brand',
             'type',
             'productDetails',
             'productDetails.photos',
             'productDetails.size',
             'productDetails.color'
-        ])
-        ->paginate(12); // Adjust pagination as needed
+        ]);
+
+        // Search by name
+        if ($request->has('search')) {
+            $searchTerm = $request->search;
+            $query->where('name', 'LIKE', "%{$searchTerm}%");
+        }
+
+        // Filter by brand
+        if ($request->has('brand_id')) {
+            $query->where('brand_id', $request->brand_id);
+        }
+
+        // Filter by type
+        if ($request->has('type_id')) {
+            $query->where('type_id', $request->type_id);
+        }
+
+        $products = $query->latest()->paginate(12);
 
         return response()->json([
             'data' => $products,

@@ -20,7 +20,7 @@ const Navbar: React.FC = () => {
   const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState(new URLSearchParams(location.search).get('search') || '');
   const [showUserMenu, setShowUserMenu] = useState(false);
 
   const isActive = (path: string) => location.pathname === path;
@@ -34,11 +34,35 @@ const Navbar: React.FC = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  // Sync search query with URL
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const search = params.get('search') || '';
+    if (location.pathname === '/products') {
+      setSearchQuery(search);
+    } else if (!search) {
+      setSearchQuery('');
+    }
+  }, [location.search, location.pathname]);
+
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (searchQuery.trim()) {
-      navigate(`/products?search=${encodeURIComponent(searchQuery)}`);
-      setSearchQuery('');
+      navigate(`/products?search=${encodeURIComponent(searchQuery.trim())}`);
+    }
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setSearchQuery(value);
+
+    // Live search: navigate to products page with search param
+    if (value.trim()) {
+      navigate(`/products?search=${encodeURIComponent(value.trim())}`, { replace: location.pathname === '/products' });
+    } else if (location.pathname === '/products') {
+      const params = new URLSearchParams(location.search);
+      params.delete('search');
+      navigate(`/products${params.toString() ? '?' + params.toString() : ''}`, { replace: true });
     }
   };
 
@@ -68,7 +92,7 @@ const Navbar: React.FC = () => {
               <input
                 type="text"
                 value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                onChange={handleInputChange}
                 placeholder="Cari kaos distro..."
                 className="w-full pl-12 pr-4 py-3 rounded-full border border-gray-200 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 outline-none transition-all"
               />
@@ -201,7 +225,7 @@ const Navbar: React.FC = () => {
               <input
                 type="text"
                 value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                onChange={handleInputChange}
                 placeholder="Cari kaos distro..."
                 className="w-full pl-12 pr-4 py-3 rounded-full border border-gray-200 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 outline-none"
               />

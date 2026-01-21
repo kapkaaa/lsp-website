@@ -55,9 +55,27 @@ const ProductList: React.FC = () => {
   const [sortBy, setSortBy] = useState(searchParams.get('sort') || 'newest');
 
   useEffect(() => {
-    fetchProducts();
-    fetchFilterOptions();
+    setSearchQuery(searchParams.get('search') || '');
+    setSelectedBrand(searchParams.get('brand') || '');
+    setSelectedType(searchParams.get('type') || '');
+    setSelectedColor(searchParams.get('color') || '');
+    setSelectedSize(searchParams.get('size') || '');
+    setPriceMin(searchParams.get('priceMin') || '');
+    setPriceMax(searchParams.get('priceMax') || '');
+    setSortBy(searchParams.get('sort') || 'newest');
+  }, [searchParams]);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      fetchProducts();
+    }, 400); // Debounce delay
+
+    return () => clearTimeout(timer);
   }, [searchQuery, selectedBrand, selectedType, selectedColor, selectedSize, priceMin, priceMax, sortBy]);
+
+  useEffect(() => {
+    fetchFilterOptions();
+  }, []);
 
   const fetchProducts = async () => {
     setLoading(true);
@@ -238,7 +256,14 @@ const ProductList: React.FC = () => {
                   <input
                     type="text"
                     value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      setSearchQuery(value);
+                      const params = new URLSearchParams(searchParams);
+                      if (value) params.set('search', value);
+                      else params.delete('search');
+                      setSearchParams(params, { replace: true });
+                    }}
                     placeholder="Nama produk..."
                     className="input"
                   />
