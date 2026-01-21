@@ -96,7 +96,7 @@ return [
         ],
         [
             'text' => 'DistroZone',
-            'url'  => 'customer',
+            'url'  => 'http://localhost:5173/',
             'icon' => 'fas fa-fw fa-home',
         ],
         ['header' => 'NAVIGASI'],
