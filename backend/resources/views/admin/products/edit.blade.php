@@ -2,11 +2,51 @@
 
 @section('page_title', 'Edit Product')
 
+@push('css')
+<style>
+/* Sidebar fixed di kanan, full height */
+.sidebar-fixed {
+    position: fixed;
+    top: 70px; /* Sesuaikan dengan tinggi navbar */
+    right: 15px;
+    width: 25%;
+    max-width: 350px;
+    min-height: 100vh;
+    z-index: 1000;
+    background: #fff;
+    padding: 20px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+/* Beri ruang ke main content agar tidak tertutup sidebar */
+.main-content-with-fixed-sidebar {
+    margin-right: 26%;
+    padding-right: 20px;
+}
+
+/* Responsif: nonaktifkan fixed di mobile */
+@media (max-width: 991.98px) {
+    .sidebar-fixed {
+        position: static;
+        width: auto;
+        margin-top: 20px;
+        right: auto;
+        min-height: auto;
+        box-shadow: none;
+    }
+    .main-content-with-fixed-sidebar {
+        margin-right: 0;
+        padding-right: 0;
+    }
+}
+</style>
+@endpush
+
 @section('main_content')
 <div class="container-fluid">
     <div class="row">
         <!-- MAIN FORM -->
-        <div class="col-md-8">
+        <div class="col-md-8 main-content-with-fixed-sidebar">
             <div class="card shadow-sm">
                 <div class="card-header bg-primary text-white">
                     <h3 class="card-title mb-0">Edit Product Information</h3>
@@ -169,42 +209,42 @@
                 </div>
             </div>
         </div>
+    </div>
+</div>
 
-        <!-- SIDEBAR RIGHT -->
-        <div class="col-md-4">
-            <!-- Product Statistics -->
-            <div class="card shadow-sm mb-4">
-                <div class="card-header bg-white">
-                    <h5 class="mb-0">Product Statistics</h5>
-                </div>
-                <div class="card-body">
-                    <p><strong>Created:</strong> {{ $product->created_at->format('d M Y H:i') }}</p>
-                    <p><strong>Last Updated:</strong> {{ $product->updated_at->format('d M Y H:i') }}</p>
-                    <p><strong>Total Variants:</strong> {{ $product->productDetails->count() }}</p>
-                </div>
-            </div>
+<!-- SIDEBAR FIXED OUTSIDE CONTAINER -->
+<div class="sidebar-fixed">
+    <!-- Product Statistics -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-info text-white">
+            <h5 class="mb-0">Product Statistics</h5>
+        </div>
+        <div class="card-body">
+            <p><strong>Created:</strong> {{ $product->created_at->format('d M Y H:i') }}</p>
+            <p><strong>Last Updated:</strong> {{ $product->updated_at->format('d M Y H:i') }}</p>
+            <p><strong>Total Variants:</strong> {{ $product->productDetails->count() }}</p>
+        </div>
+    </div>
 
-            <!-- Actions -->
-            <div class="card shadow-sm">
-                <div class="card-header bg-white">
-                    <h5 class="mb-0">Actions</h5>
-                </div>
-                <div class="card-body">
-                    <a href="{{ route('admin.products.index') }}" class="btn btn-secondary btn-block mb-2">
-                        <i class="fas fa-list"></i> All Products
-                    </a>
-                    <form action="{{ route('admin.products.destroy', $product->id) }}" method="POST" id="delete-form-{{ $product->id }}">
-                        @csrf
-                        @method('DELETE')
-                        <button
-                            type="button"
-                            class="btn btn-danger btn-block"
-                            onclick="confirmDelete('delete-form-{{ $product->id }}')">
-                            <i class="fas fa-trash"></i> Delete Product
-                        </button>
-                    </form>
-                </div>
-            </div>
+    <!-- Actions -->
+    <div class="card shadow-sm">
+        <div class="card-header bg-secondary text-white">
+            <h5 class="mb-0">Actions</h5>
+        </div>
+        <div class="card-body">
+            <a href="{{ route('admin.products.index') }}" class="btn btn-secondary btn-block mb-2">
+                <i class="fas fa-list"></i> All Products
+            </a>
+            <form action="{{ route('admin.products.destroy', $product->id) }}" method="POST" id="delete-form-{{ $product->id }}">
+                @csrf
+                @method('DELETE')
+                <button
+                    type="button"
+                    class="btn btn-danger btn-block"
+                    onclick="confirmDelete('delete-form-{{ $product->id }}')">
+                    <i class="fas fa-trash"></i> Delete Product
+                </button>
+            </form>
         </div>
     </div>
 </div>
@@ -255,11 +295,9 @@
         if (window.productCreateInitialized) return;
         window.productCreateInitialized = true;
 
-        // Fungsi untuk mendapatkan indeks terbesar yang sedang digunakan
         function getMaxVariantIndex() {
             let maxIndex = -1;
             $('.variant-item').each(function() {
-                // Cari input dengan name yang mengandung 'variants[' dan angka indeks
                 const inputs = $(this).find('input, select');
                 inputs.each(function() {
                     const name = $(this).attr('name');
@@ -275,7 +313,6 @@
             return maxIndex;
         }
 
-        // Inisialisasi variantIndex berdasarkan indeks terbesar yang ada
         let variantIndex = getMaxVariantIndex() + 1;
 
         function addVariant() {
@@ -293,7 +330,6 @@
 
         $(document).off('click', '.remove-variant').on('click', '.remove-variant', function() {
             $(this).closest('.variant-item').remove();
-            // Setelah menghapus, perbarui variantIndex berdasarkan indeks terbesar yang tersisa
             variantIndex = getMaxVariantIndex() + 1;
         });
 

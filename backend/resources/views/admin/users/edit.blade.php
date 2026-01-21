@@ -10,7 +10,7 @@
 <div class="container-fluid">
     <div class="row">
         <!-- Form Edit User -->
-        <div class="col-md-8">
+        <div class="col-md-8 main-content-with-fixed-sidebar">
             <div class="card">
                 <div class="card-header bg-primary text-white">
                     <h3 class="card-title">Edit User Information</h3>
@@ -140,7 +140,7 @@
         </div>
 
         <!-- Kolom Kanan: Statistics & Actions -->
-        <div class="col-md-4">
+        <div class="col-md-4 fixed-sidebar">
             <!-- User Statistics -->
             <div class="card">
                 <div class="card-header bg-info text-white">

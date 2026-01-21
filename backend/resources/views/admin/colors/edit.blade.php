@@ -11,7 +11,7 @@
 @section('main_content')
 <div class="container-fluid">
     <div class="row">
-        <div class="col-md-6">
+        <div class="col-md-6 main-content-with-fixed-sidebar">
             <!-- Form edit color -->
             <div class="card">
                 <div class="card-header bg-primary text-white">
@@ -60,9 +60,9 @@
         </div>
 
         <!-- Kolom kanan: informasi tambahan -->
-        <div class="col-md-6">
+        <div class="col-md-6 fixed-sidebar">
             <div class="card">
-                <div class="card-header">
+                <div class="card-header bg-info text-white">
                     <h3 class="card-title">Color Statistics</h3>
                 </div>
                 <div class="card-body">
@@ -73,7 +73,7 @@
             </div>
 
             <div class="card mt-3">
-                <div class="card-header">
+                <div class="card-header bg-secondary text-white">
                     <h3 class="card-title">Actions</h3>
                 </div>
                 <div class="card-body">

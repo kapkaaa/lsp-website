@@ -1,3 +1,24 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+
+.sidebar-fixed {
+  position: fixed;
+  top: 70px;
+  /* Sesuaikan dengan tinggi navbar */
+  right: 0;
+  width: 25%;
+  /* Atau bisa pakai 300px */
+  max-width: 350px;
+  z-index: 1000;
+  padding-right: 15px;
+  padding-left: 15px;
+}
+
+/* Beri margin ke main content agar tidak tertutup sidebar */
+.main-content-with-fixed-sidebar {
+  margin-right: 25%;
+  padding-right: 30px;
+  /* Agar teks tidak terlalu dekat ke edge */
+}
