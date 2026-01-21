@@ -37,15 +37,19 @@ class ChatController extends Controller
     public function send(Request $request)
     {
         $request->validate([
-            'receiver_id' => 'required|exists:users,id',
+            'receiver_id' => 'nullable|exists:users,id',
             'message' => 'required|string|max:1000'
         ]);
 
         $user = $request->user();
         
+        // If receiver_id is not provided, default to Admin (ID 1)
+        // This is useful for customers starting a chat with customer service
+        $receiverId = $request->receiver_id ?? 1;
+
         $chat = CustomerServiceChat::create([
             'sender_id' => $user->id,
-            'receiver_id' => $request->receiver_id,
+            'receiver_id' => $receiverId,
             'message' => $request->message
         ]);
 
