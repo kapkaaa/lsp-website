@@ -14,7 +14,9 @@ import { alert as swal } from '../utils/swal';
 interface Message {
   id: number;
   message: string;
-  sender_type: 'customer' | 'kasir';
+  sender_id: number;
+  receiver_id: number;
+  sender_type?: 'customer' | 'kasir'; // Optional fallback
   created_at: string;
 }
 
@@ -159,35 +161,40 @@ const CustomerServiceChat: React.FC = () => {
             </div>
           ) : (
             <div className="space-y-4">
-              {messages.map((message) => (
-                <div
-                  key={message.id}
-                  className={`flex ${message.sender_type === 'customer' ? 'justify-end' : 'justify-start'
-                    } animate-fade-in`}
-                >
+              {messages.map((message) => {
+                const isMe = message.sender_id === user?.id;
+                return (
                   <div
-                    className={`max-w-[70%] ${message.sender_type === 'customer'
-                      ? 'bg-cyan-500 text-white rounded-l-xl rounded-tr-xl'
-                      : 'bg-gray-100 text-gray-900 rounded-r-xl rounded-tl-xl'
-                      } px-4 py-3 shadow-sm`}
+                    key={message.id}
+                    className={`flex ${isMe ? 'justify-end' : 'justify-start'} animate-fade-in`}
                   >
-                    {message.sender_type === 'kasir' && (
-                      <p className="text-xs font-semibold mb-1 text-cyan-600">
-                        CS DistroZone
-                      </p>
-                    )}
-                    <p className="text-sm leading-relaxed">{message.message}</p>
-                    <p
-                      className={`text-xs mt-1 ${message.sender_type === 'customer'
-                        ? 'text-cyan-100'
-                        : 'text-gray-500'
-                        }`}
+                    <div
+                      className={`max-w-[70%] ${isMe
+                        ? 'bg-cyan-600 text-white rounded-l-xl rounded-tr-xl'
+                        : 'bg-gray-100 text-gray-900 rounded-r-xl rounded-tl-xl'
+                        } px-4 py-3 shadow-md transition-all hover:shadow-lg`}
                     >
-                      {formatTime(message.created_at)}
-                    </p>
+                      {!isMe && (
+                        <p className="text-xs font-bold mb-1 text-cyan-700">
+                          CS DistroZone
+                        </p>
+                      )}
+                      <p className="text-sm font-medium leading-relaxed">{message.message}</p>
+                      <div className={`flex items-center gap-1 mt-1 ${isMe ? 'justify-end' : 'justify-start'}`}>
+                        <p
+                          className={`text-[10px] ${isMe
+                            ? 'text-cyan-100'
+                            : 'text-gray-500'
+                            }`}
+                        >
+                          {formatTime(message.created_at)}
+                        </p>
+                        {isMe && <span className="text-[10px] text-cyan-100 opacity-80">✓✓</span>}
+                      </div>
+                    </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
               <div ref={messagesEndRef} />
             </div>
           )}
