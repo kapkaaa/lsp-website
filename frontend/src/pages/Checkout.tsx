@@ -525,7 +525,7 @@ const Checkout: React.FC = () => {
             <img
               src="/qris.jpeg"
               alt="QRIS Code"
-              className="w-64 h-64 object-contain mx-auto"
+              className="w-70 h-70 object-contain mx-auto"
             />
           </div>
           <div className="bg-cyan-50 p-3 rounded-lg">
