@@ -98,14 +98,17 @@ class ProductController extends Controller
                 foreach ($request->file("variants.{$index}.photos") as $photo) {
                     try {
                         // Store file on the supabase disk explicitly
-                        $path = $photo->store('products', 'supabase');
+                        $path = $photo->store('products/' . $productDetail->id, 'supabase');
+                        
+                        // Get full public URL
+                        $fullUrl = \Illuminate\Support\Facades\Storage::disk('supabase')->url($path);
 
-                        // Log the path for debugging
-                        \Log::info('File stored on Supabase in ProductController:', ['path' => $path]);
+                        // Log the URL for debugging
+                        \Log::info('File stored on Supabase in ProductController:', ['path' => $path, 'url' => $fullUrl]);
 
                         ProductPhoto::create([
                             'product_detail_id' => $productDetail->id,
-                            'photo_url' => $path
+                            'photo_url' => $fullUrl
                         ]);
                     } catch (\Exception $e) {
                         \Log::error('Failed to store photo on Supabase in ProductController:', ['error' => $e->getMessage()]);
@@ -173,7 +176,10 @@ class ProductController extends Controller
                 }
                 // Hapus foto lama
                 foreach ($detail->photos as $photo) {
-                    Storage::disk()->delete($photo->photo_url);
+                    $path = ProductPhoto::extractPathFromUrl($photo->getRawOriginal('photo_url'));
+                    if ($path) {
+                        \Illuminate\Support\Facades\Storage::disk('supabase')->delete($path);
+                    }
                     $photo->delete();
                 }
                 $detail->delete();
@@ -220,12 +226,16 @@ class ProductController extends Controller
                 foreach ($request->file("variants.{$index}.photos") as $photo) {
                     try {
                         // Store file on the supabase disk explicitly
-                        $path = $photo->store('products', 'supabase');
-                        \Log::info('File stored on Supabase in ProductController update method:', ['path' => $path]);
+                        $path = $photo->store('products/' . $productDetail->id, 'supabase');
+                        
+                        // Get full public URL
+                        $fullUrl = \Illuminate\Support\Facades\Storage::disk('supabase')->url($path);
+                        
+                        \Log::info('File stored on Supabase in ProductController update method:', ['path' => $path, 'url' => $fullUrl]);
 
                         ProductPhoto::create([
                             'product_detail_id' => $productDetail->id,
-                            'photo_url' => $path
+                            'photo_url' => $fullUrl
                         ]);
                     } catch (\Exception $e) {
                         \Log::error('Failed to store photo on Supabase in ProductController update method:', ['error' => $e->getMessage()]);
@@ -251,8 +261,9 @@ class ProductController extends Controller
         // Delete photos
         foreach ($product->productDetails as $detail) {
             foreach ($detail->photos as $photo) {
-                if ($photo->photo_url) {
-                    Storage::disk()->delete($photo->photo_url);
+                $path = ProductPhoto::extractPathFromUrl($photo->getRawOriginal('photo_url'));
+                if ($path) {
+                    \Illuminate\Support\Facades\Storage::disk('supabase')->delete($path);
                 }
                 $photo->delete();
             }

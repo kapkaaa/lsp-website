@@ -26,18 +26,20 @@ class ProductPhotoController extends Controller
 
         foreach ($request->file('photos') as $photo) {
             try {
-                // Store file on the supabase disk explicitly
-                $path = $photo->store('products', 'supabase');
+                // Store file on the supabase disk explicitly with variant ID folder
+                $path = $photo->store('products/' . $variant->id, 'supabase');
+                
+                // Get the full public URL
+                $fullUrl = \Illuminate\Support\Facades\Storage::disk('supabase')->url($path);
 
-                // Log the path for debugging
-                \Log::info('File stored on Supabase:', ['path' => $path]);
+                \Log::info('File stored on Supabase:', ['path' => $path, 'url' => $fullUrl]);
 
                 ProductPhoto::create([
                     'product_detail_id' => $variant->id,
-                    'photo_url' => $path
+                    'photo_url' => $fullUrl
                 ]);
 
-                $uploadedFiles[] = $path;
+                $uploadedFiles[] = $fullUrl;
             } catch (\Exception $e) {
                 \Log::error('Failed to store photo on Supabase:', ['error' => $e->getMessage()]);
 
@@ -53,6 +55,17 @@ class ProductPhotoController extends Controller
     
     public function destroy(ProductDetail $variant, ProductPhoto $photo)
     {
+        try {
+            // Extract the path from the full URL or relative path
+            $path = ProductPhoto::extractPathFromUrl($photo->getRawOriginal('photo_url'));
+            
+            if ($path) {
+                \Illuminate\Support\Facades\Storage::disk('supabase')->delete($path);
+                \Log::info('Deleted photo from Supabase:', ['path' => $path]);
+            }
+        } catch (\Exception $e) {
+            \Log::error('Failed to delete photo from Supabase:', ['error' => $e->getMessage()]);
+        }
         
         $photo->delete();
         
