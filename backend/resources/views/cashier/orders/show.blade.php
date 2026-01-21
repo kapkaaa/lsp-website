@@ -140,9 +140,9 @@
                 </div>
                 <div class="card-body">
                     @if($order->canBeVerified())
-                    <form action="{{ route('admin.orders.verify-payment', $order->id) }}" method="POST" class="mb-2">
+                    <form id="verify-payment-form" action="{{ route('admin.orders.verify-payment', $order->id) }}" method="POST" class="mb-2">
                         @csrf
-                        <button type="submit" class="btn btn-success btn-block" onclick="return confirm('Verify this payment?')">
+                        <button type="button" class="btn btn-success btn-block" onclick="handleVerifyPayment()">
                             <i class="fas fa-check"></i> Verify Payment
                         </button>
                     </form>
@@ -154,22 +154,22 @@
                     @endif
 
                     @if($order->canBeShipped())
-                    <form action="{{ route('admin.orders.update-status', $order->id) }}" method="POST" class="mb-2">
+                    <form id="shipped-form" action="{{ route('admin.orders.update-status', $order->id) }}" method="POST" class="mb-2">
                         @csrf
                         @method('PUT')
                         <input type="hidden" name="order_status" value="shipped">
-                        <button type="submit" class="btn btn-primary btn-block" onclick="return confirm('Mark as shipped?')">
+                        <button type="button" class="btn btn-primary btn-block" onclick="handleMarkAsShipped()">
                             <i class="fas fa-shipping-fast"></i> Mark as Shipped
                         </button>
                     </form>
                     @endif
 
                     @if($order->isShipped())
-                    <form action="{{ route('admin.orders.update-status', $order->id) }}" method="POST" class="mb-2">
+                    <form id="completed-form" action="{{ route('admin.orders.update-status', $order->id) }}" method="POST" class="mb-2">
                         @csrf
                         @method('PUT')
                         <input type="hidden" name="order_status" value="completed">
-                        <button type="submit" class="btn btn-success btn-block" onclick="return confirm('Mark as completed?')">
+                        <button type="button" class="btn btn-success btn-block" onclick="handleMarkAsCompleted()">
                             <i class="fas fa-check-double"></i> Mark as Completed
                         </button>
                     </form>
@@ -256,4 +256,43 @@
         </div>
     </div>
 </div>
+@endsection
+@section('js')
+<script>
+    function handleVerifyPayment() {
+        confirmAction({
+            title: 'Verify Payment?',
+            text: 'This will mark the order as paid and verified.',
+            icon: 'question',
+            confirmButtonText: 'Yes, Verify It!',
+            callback: function() {
+                document.getElementById('verify-payment-form').submit();
+            }
+        });
+    }
+
+    function handleMarkAsShipped() {
+        confirmAction({
+            title: 'Mark as Shipped?',
+            text: 'This will update the order status to Shipped.',
+            icon: 'info',
+            confirmButtonText: 'Yes, Shipped!',
+            callback: function() {
+                document.getElementById('shipped-form').submit();
+            }
+        });
+    }
+
+    function handleMarkAsCompleted() {
+        confirmAction({
+            title: 'Mark as Completed?',
+            text: 'This will complete the order.',
+            icon: 'success',
+            confirmButtonText: 'Yes, Complete!',
+            callback: function() {
+                document.getElementById('completed-form').submit();
+            }
+        });
+    }
+</script>
 @endsection

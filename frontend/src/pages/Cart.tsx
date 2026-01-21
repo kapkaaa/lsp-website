@@ -11,6 +11,7 @@ import Loading from '../components/Loading';
 import Button from '../components/Button';
 import { formatCurrency } from '../utils/formatters';
 import { useUser } from '../contexts/UserContext';
+import { alert as swal } from '../utils/swal';
 
 interface CartItem {
   id: number;
@@ -98,7 +99,7 @@ const Cart: React.FC = () => {
     if (!productDetail) return;
 
     if (newQuantity > (productDetail.stock || 0)) {
-      alert(`Stok hanya tersedia ${productDetail.stock} pcs`);
+      swal.warning('Stok Terbatas', `Stok hanya tersedia ${productDetail.stock} pcs`);
       return;
     }
 
@@ -112,14 +113,15 @@ const Cart: React.FC = () => {
       ));
     } catch (error) {
       console.error('Failed to update quantity:', error);
-      alert('Gagal mengupdate jumlah');
+      swal.error('Gagal!', 'Gagal mengupdate jumlah');
     } finally {
       setUpdating(null);
     }
   };
 
   const removeItem = async (itemId: number) => {
-    if (!confirm('Hapus item dari keranjang?')) return;
+    const result = await swal.confirm('Hapus Item?', 'Apakah Anda yakin ingin menghapus item ini dari keranjang?');
+    if (!result.isConfirmed) return;
 
     setUpdating(itemId);
     try {
@@ -132,7 +134,7 @@ const Cart: React.FC = () => {
       });
     } catch (error) {
       console.error('Failed to remove item:', error);
-      alert('Gagal menghapus item');
+      swal.error('Gagal!', 'Gagal menghapus item');
     } finally {
       setUpdating(null);
     }

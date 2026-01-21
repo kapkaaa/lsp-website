@@ -9,6 +9,7 @@ import Button from '../components/Button';
 import { formatTime } from '../utils/formatters';
 import Loading from '../components/Loading';
 import { useUser } from '../contexts/UserContext';
+import { alert as swal } from '../utils/swal';
 
 interface Message {
   id: number;
@@ -85,7 +86,7 @@ const CustomerServiceChat: React.FC = () => {
       fetchMessages();
     } catch (error) {
       console.error('Failed to send message:', error);
-      alert('Gagal mengirim pesan');
+      swal.error('Gagal!', 'Gagal mengirim pesan. Silakan coba lagi.');
     } finally {
       setSending(false);
     }

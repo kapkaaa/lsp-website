@@ -13,6 +13,7 @@ import Button from '../components/Button';
 import Input from '../components/Input';
 import { useUser } from '../contexts/UserContext';
 import { validatePassword, isValidEmail, isValidPhone } from '../utils/validation';
+import { alert as swal } from '../utils/swal';
 
 const Register: React.FC = () => {
   const navigate = useNavigate();
@@ -90,12 +91,12 @@ const Register: React.FC = () => {
         address: formData.address,
         nik: formData.nik,
       });
-      alert('Registrasi berhasil! Silakan login.');
+      await swal.success('Registrasi Berhasil!', 'Akun Anda sudah terdaftar. Silakan login.');
       navigate('/login');
     } catch (err: any) {
       const serverErrors = err.response?.data?.errors || {};
       setErrors(serverErrors);
-      alert(err.response?.data?.message || 'Registrasi gagal');
+      swal.error('Registrasi Gagal!', err.response?.data?.message || 'Terjadi kesalahan saat registrasi.');
     } finally {
       setLoading(false);
     }

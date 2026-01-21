@@ -17,6 +17,7 @@ import Button from '../components/Button';
 import { formatCurrency } from '../utils/formatters';
 import { useUser } from '../contexts/UserContext';
 import { useCart } from '../contexts/CartContext';
+import { alert as swal } from '../utils/swal';
 
 interface ProductDetail {
   id: number;
@@ -82,7 +83,7 @@ const ProductDetailPage: React.FC = () => {
     }
 
     if (!selectedColor || !selectedSize) {
-      alert('Pilih warna dan ukuran terlebih dahulu');
+      swal.warning('Pilihan Belum Lengkap', 'Pilih warna dan ukuran terlebih dahulu');
       return;
     }
 
@@ -92,12 +93,12 @@ const ProductDetailPage: React.FC = () => {
     );
 
     if (!selectedDetail) {
-      alert('Varian yang dipilih tidak tersedia');
+      swal.error('Varian Tidak Tersedia', 'Varian yang dipilih tidak tersedia');
       return;
     }
 
     if (quantity > selectedDetail.stock) {
-      alert(`Stok hanya tersedia ${selectedDetail.stock} pcs`);
+      swal.warning('Stok Terbatas', `Stok hanya tersedia ${selectedDetail.stock} pcs`);
       return;
     }
 
@@ -117,7 +118,7 @@ const ProductDetailPage: React.FC = () => {
       setTimeout(() => setAddToCartSuccess(false), 2000);
     } catch (error) {
       console.error('Failed to add to cart:', error);
-      alert('Gagal menambahkan ke keranjang');
+      swal.error('Gagal!', 'Gagal menambahkan ke keranjang');
     } finally {
       setAddingToCart(false);
     }
@@ -130,7 +131,7 @@ const ProductDetailPage: React.FC = () => {
     }
 
     if (!selectedColor || !selectedSize) {
-      alert('Pilih warna dan ukuran terlebih dahulu');
+      swal.warning('Pilihan Belum Lengkap', 'Pilih warna dan ukuran terlebih dahulu');
       return;
     }
 
@@ -140,12 +141,12 @@ const ProductDetailPage: React.FC = () => {
     );
 
     if (!selectedDetail) {
-      alert('Varian yang dipilih tidak tersedia');
+      swal.error('Varian Tidak Tersedia', 'Varian yang dipilih tidak tersedia');
       return;
     }
 
     if (quantity > selectedDetail.stock) {
-      alert(`Stok hanya tersedia ${selectedDetail.stock} pcs`);
+      swal.warning('Stok Terbatas', `Stok hanya tersedia ${selectedDetail.stock} pcs`);
       return;
     }
 
@@ -164,7 +165,7 @@ const ProductDetailPage: React.FC = () => {
       navigate('/checkout');
     } catch (error) {
       console.error('Failed to process buy now:', error);
-      alert('Gagal memproses pembelian');
+      swal.error('Gagal!', 'Gagal memproses pembelian');
       setBuyingNow(false);
     }
   };

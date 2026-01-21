@@ -15,6 +15,7 @@ import Button from '../components/Button';
 import { formatCurrency } from '../utils/formatters';
 import { calculateWeight, calculateShippingCost } from '../utils/shippingCalculator';
 import { useUser } from '../contexts/UserContext';
+import { alert as swal } from '../utils/swal';
 
 interface CartItem {
   id: number;
@@ -106,7 +107,7 @@ const Checkout: React.FC = () => {
 
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
-    alert('Nomor rekening berhasil disalin!');
+    swal.success('Berhasil!', 'Nomor rekening berhasil disalin!');
   };
 
   const handlePaymentProofChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -125,12 +126,12 @@ const Checkout: React.FC = () => {
     e.preventDefault();
 
     if (!destinationCity || !address) {
-      alert('Mohon lengkapi alamat pengiriman');
+      swal.warning('Data Belum Lengkap', 'Mohon lengkapi alamat pengiriman');
       return;
     }
 
     if (!paymentProof) {
-      alert('Mohon upload bukti pembayaran');
+      swal.warning('Bukti Bayar Belum Ada', 'Mohon upload bukti pembayaran');
       return;
     }
 
@@ -157,11 +158,11 @@ const Checkout: React.FC = () => {
         },
       });
 
-      alert('Pesanan berhasil dibuat! Silakan tunggu verifikasi dari kasir.');
+      await swal.success('Pesanan Berhasil!', 'Pesanan berhasil dibuat! Silakan tunggu verifikasi dari kasir.');
       navigate('/orders');
     } catch (error) {
       console.error('Failed to create order:', error);
-      alert('Gagal membuat pesanan. Silakan coba lagi.');
+      swal.error('Gagal!', 'Gagal membuat pesanan. Silakan coba lagi.');
     } finally {
       setSubmitting(false);
     }

@@ -14,6 +14,7 @@ import Button from '../components/Button';
 import Modal from '../components/Modal';
 import { formatCurrency, formatDateTime } from '../utils/formatters';
 import { useUser } from '../contexts/UserContext';
+import { alert as swal } from '../utils/swal';
 
 interface Order {
   id: number;
@@ -78,13 +79,13 @@ const OrderHistory: React.FC = () => {
     setCanceling(true);
     try {
       await apiClient.post(`/orders/${selectedOrder.id}/cancel`);
-      alert('Pesanan berhasil dibatalkan');
+      swal.success('Berhasil!', 'Pesanan berhasil dibatalkan');
       setShowCancelModal(false);
       setSelectedOrder(null);
       fetchOrders();
     } catch (error) {
       console.error('Failed to cancel order:', error);
-      alert('Gagal membatalkan pesanan. Silakan coba lagi.');
+      swal.error('Gagal!', 'Gagal membatalkan pesanan. Silakan coba lagi.');
     } finally {
       setCanceling(false);
     }
