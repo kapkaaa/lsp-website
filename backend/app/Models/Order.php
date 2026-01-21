@@ -117,6 +117,16 @@ class Order extends Model
         return $this->order_status === 'cancelled';
     }
 
+    public function isRefunded()
+    {
+        return $this->order_status === 'refunded' || $this->payment_status === 'refunded';
+    }
+
+    public function canBeRefunded()
+    {
+        return in_array($this->order_status, ['verified', 'shipped', 'completed']) && $this->payment_status === 'paid';
+    }
+
     public function getPaymentProofUrlAttribute()
     {
         if ($this->payment_proof && !str_starts_with($this->payment_proof, 'http')) {

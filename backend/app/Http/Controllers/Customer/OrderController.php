@@ -90,6 +90,7 @@ class OrderController extends Controller
                 OrderDetail::create([
                     'order_id' => $order->id,
                     'product_id' => $item['product_id'],
+                    'product_detail_id' => $item['product_detail_id'],
                     'quantity' => $item['quantity'],
                     'unit_price' => $item['unit_price'],
                     'total' => $item['total']

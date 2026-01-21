@@ -32,6 +32,8 @@
                             <span class="badge badge-warning">Pending</span>
                             @elseif($order->payment_status == 'paid')
                             <span class="badge badge-success">Paid</span>
+                            @elseif($order->payment_status == 'refunded')
+                            <span class="badge badge-info">Refunded</span>
                             @else
                             <span class="badge badge-danger">Rejected</span>
                             @endif
@@ -45,6 +47,8 @@
                             <span class="badge badge-primary">Shipped</span>
                             @elseif($order->order_status == 'completed')
                             <span class="badge badge-success">Completed</span>
+                            @elseif($order->order_status == 'refunded')
+                            <span class="badge badge-info">Refunded</span>
                             @else
                             <span class="badge badge-danger">Cancelled</span>
                             @endif
@@ -173,6 +177,15 @@
                         <input type="hidden" name="order_status" value="completed">
                         <button type="submit" class="btn btn-success btn-block" onclick="return confirm('Mark as completed?')">
                             <i class="fas fa-check-double"></i> Mark as Completed
+                        </button>
+                    </form>
+                    @endif
+
+                    @if($order->canBeRefunded())
+                    <form action="{{ route('admin.orders.refund', $order->id) }}" method="POST" class="mb-2">
+                        @csrf
+                        <button type="submit" class="btn btn-warning btn-block" onclick="return confirm('Are you sure you want to REFUND this order? Stock will be restored and this order will be EXCLUDED from reports.')">
+                            <i class="fas fa-undo"></i> Refund Order
                         </button>
                     </form>
                     @endif

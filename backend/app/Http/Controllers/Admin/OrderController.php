@@ -106,7 +106,7 @@ class OrderController extends Controller
     public function updateStatus(Request $request, Order $order)
     {
         $validated = $request->validate([
-            'order_status' => 'required|in:pending,verified,shipped,completed,cancelled'
+            'order_status' => 'required|in:pending,verified,shipped,completed,cancelled,refunded'
         ]);
 
         try {
@@ -168,6 +168,48 @@ class OrderController extends Controller
             DB::rollBack();
             return redirect()->back()
                 ->with('error', 'Failed to reject payment: ' . $e->getMessage());
+        }
+    }
+
+    public function refund(Request $request, Order $order)
+    {
+        if (!$order->canBeRefunded()) {
+            return redirect()->back()
+                ->with('error', 'Order cannot be refunded at this stage');
+        }
+
+        try {
+            DB::beginTransaction();
+
+            // Update order status
+            $order->payment_status = 'refunded';
+            $order->order_status = 'refunded';
+            $order->save();
+
+            // Restore stock
+            foreach ($order->orderDetails as $detail) {
+                if ($detail->product_detail_id) {
+                    $productDetail = \App\Models\ProductDetail::find($detail->product_detail_id);
+                    if ($productDetail) {
+                        $productDetail->increaseStock($detail->quantity);
+                    }
+                } else {
+                    $product = $detail->product;
+                    $firstDetail = $product->productDetails()->first();
+                    if ($firstDetail) {
+                        $firstDetail->increaseStock($detail->quantity);
+                    }
+                }
+            }
+
+            DB::commit();
+
+            return redirect()->back()
+                ->with('success', 'Order has been refunded and stock restored');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()
+                ->with('error', 'Failed to refund order: ' . $e->getMessage());
         }
     }
 }

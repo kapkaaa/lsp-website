@@ -31,7 +31,8 @@ class ReportController extends Controller
 
         // Online Sales
         $onlineQuery = Order::whereBetween('created_at', [$startDate . ' 00:00:00', $endDate . ' 23:59:59'])
-            ->where('payment_status', 'paid');
+            ->where('payment_status', 'paid')
+            ->where('order_status', '!=', 'refunded');
         
         $onlineSales = [
             'count' => $onlineQuery->count(),
@@ -63,6 +64,7 @@ class ReportController extends Controller
             
             $dailyOnline = Order::whereDate('created_at', $dateStr)
                 ->where('payment_status', 'paid')
+                ->where('order_status', '!=', 'refunded')
                 ->sum('total_payment');
             
             $dailyOffline = Transaction::whereDate('created_at', $dateStr)
@@ -143,6 +145,7 @@ class ReportController extends Controller
         $onlineOrders = Order::with('orderDetails.product')
             ->whereBetween('created_at', [$startDate . ' 00:00:00', $endDate . ' 23:59:59'])
             ->where('payment_status', 'paid')
+            ->where('order_status', '!=', 'refunded')
             ->get();
 
         $onlineRevenue = $onlineOrders->sum('subtotal'); // Only product revenue, excluding shipping
@@ -210,6 +213,7 @@ class ReportController extends Controller
             $data['onlineOrders'] = Order::with('orderDetails.product')
                 ->whereBetween('created_at', [$startDate . ' 00:00:00', $endDate . ' 23:59:59'])
                 ->where('payment_status', 'paid')
+                ->where('order_status', '!=', 'refunded')
                 ->get();
             
             // Offline Sales
@@ -253,6 +257,7 @@ class ReportController extends Controller
             $onlineOrders = Order::with('orderDetails.product')
                 ->whereBetween('created_at', [$startDate . ' 00:00:00', $endDate . ' 23:59:59'])
                 ->where('payment_status', 'paid')
+                ->where('order_status', '!=', 'refunded')
                 ->get();
 
             $data['onlineRevenue'] = $onlineOrders->sum('subtotal');
