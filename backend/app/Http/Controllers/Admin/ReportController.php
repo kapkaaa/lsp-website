@@ -37,7 +37,7 @@ class ReportController extends Controller
         $onlineSales = [
             'count' => $onlineQuery->count(),
             'total' => $onlineQuery->sum('total_payment'),
-            'orders' => $onlineQuery->with(['buyer', 'orderDetails.product'])->get()
+            'orders' => $onlineQuery->with(['buyer', 'orderDetails.product_detail.product'])->get()
         ];
 
         // Offline Sales
@@ -142,7 +142,7 @@ class ReportController extends Controller
         $endDate = $request->get('end_date', Carbon::now()->format('Y-m-d'));
 
         // Online profit
-        $onlineOrders = Order::with('orderDetails.product')
+        $onlineOrders = Order::with('orderDetails.product_detail.product')
             ->whereBetween('created_at', [$startDate . ' 00:00:00', $endDate . ' 23:59:59'])
             ->where('payment_status', 'paid')
             ->where('order_status', '!=', 'refunded')
@@ -151,7 +151,7 @@ class ReportController extends Controller
         $onlineRevenue = $onlineOrders->sum('subtotal'); // Only product revenue, excluding shipping
         $onlineCost = $onlineOrders->sum(function($order) {
             return $order->orderDetails->sum(function($detail) {
-                return $detail->product->cost_price * $detail->quantity;
+                return ($detail->product_detail->product->cost_price ?? 0) * $detail->quantity;
             });
         });
         $onlineProfit = $onlineRevenue - $onlineCost;
@@ -210,7 +210,7 @@ class ReportController extends Controller
 
         if ($type === 'sales') {
             // Online Sales
-            $data['onlineOrders'] = Order::with('orderDetails.product')
+            $data['onlineOrders'] = Order::with('orderDetails.product_detail.product')
                 ->whereBetween('created_at', [$startDate . ' 00:00:00', $endDate . ' 23:59:59'])
                 ->where('payment_status', 'paid')
                 ->where('order_status', '!=', 'refunded')
@@ -254,7 +254,7 @@ class ReportController extends Controller
         }
         elseif ($type === 'profit') {
             // Calculate profit data
-            $onlineOrders = Order::with('orderDetails.product')
+            $onlineOrders = Order::with('orderDetails.product_detail.product')
                 ->whereBetween('created_at', [$startDate . ' 00:00:00', $endDate . ' 23:59:59'])
                 ->where('payment_status', 'paid')
                 ->where('order_status', '!=', 'refunded')
@@ -263,7 +263,7 @@ class ReportController extends Controller
             $data['onlineRevenue'] = $onlineOrders->sum('subtotal');
             $data['onlineCost'] = $onlineOrders->sum(function($order) {
                 return $order->orderDetails->sum(function($detail) {
-                    return $detail->product->cost_price * $detail->quantity;
+                    return ($detail->product_detail->product->cost_price ?? 0) * $detail->quantity;
                 });
             });
             $data['onlineProfit'] = $data['onlineRevenue'] - $data['onlineCost'];

@@ -54,8 +54,8 @@ class OrderController extends Controller
             'buyer', 
             'approver', 
             'shippingRate', 
-            'orderDetails.product.brand',
-            'orderDetails.product.type',
+            'orderDetails.product_detail.product.brand',
+            'orderDetails.product_detail.product.type',
             'payment'
         ]);
 
@@ -87,7 +87,7 @@ class OrderController extends Controller
                     'gross_amount' => $order->total_payment,
                     'income' => $order->total_payment,
                     'profit' => $order->subtotal - ($order->orderDetails->sum(function($detail) {
-                        return $detail->product->cost_price * $detail->quantity;
+                        return ($detail->product_detail->product->cost_price ?? 0) * $detail->quantity;
                     }))
                 ]
             );
@@ -112,16 +112,17 @@ class OrderController extends Controller
         try {
             DB::beginTransaction();
 
+            $order->load('orderDetails.product_detail');
+
             $oldStatus = $order->order_status;
             $order->order_status = $validated['order_status'];
 
             // If cancelled, restore stock
             if ($validated['order_status'] === 'cancelled' && $oldStatus !== 'cancelled') {
                 foreach ($order->orderDetails as $detail) {
-                    // Assuming you store product_detail_id in order_details
-                    // You may need to adjust this based on your actual implementation
-                    $product = $detail->product;
-                    $product->productDetails()->first()->increaseStock($detail->quantity);
+                    if ($detail->product_detail) {
+                        $detail->product_detail->increaseStock($detail->quantity);
+                    }
                 }
             }
 
@@ -148,6 +149,8 @@ class OrderController extends Controller
         try {
             DB::beginTransaction();
 
+            $order->load('orderDetails.product_detail');
+
             $order->payment_status = 'rejected';
             $order->order_status = 'cancelled';
             $order->approved_by = auth()->id();
@@ -156,8 +159,9 @@ class OrderController extends Controller
 
             // Restore stock
             foreach ($order->orderDetails as $detail) {
-                $product = $detail->product;
-                $product->productDetails()->first()->increaseStock($detail->quantity);
+                if ($detail->product_detail) {
+                    $detail->product_detail->increaseStock($detail->quantity);
+                }
             }
 
             DB::commit();
@@ -188,17 +192,8 @@ class OrderController extends Controller
 
             // Restore stock
             foreach ($order->orderDetails as $detail) {
-                if ($detail->product_detail_id) {
-                    $productDetail = \App\Models\ProductDetail::find($detail->product_detail_id);
-                    if ($productDetail) {
-                        $productDetail->increaseStock($detail->quantity);
-                    }
-                } else {
-                    $product = $detail->product;
-                    $firstDetail = $product->productDetails()->first();
-                    if ($firstDetail) {
-                        $firstDetail->increaseStock($detail->quantity);
-                    }
+                if ($detail->product_detail) {
+                    $detail->product_detail->increaseStock($detail->quantity);
                 }
             }
 

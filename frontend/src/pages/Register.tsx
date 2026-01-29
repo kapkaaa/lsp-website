@@ -178,17 +178,6 @@ const Register: React.FC = () => {
                 required
               />
 
-              <Input
-                type="text"
-                name="nik"
-                label="NIK (Opsional)"
-                value={formData.nik}
-                onChange={handleChange}
-                icon={<IdentificationIcon className="h-5 w-5" />}
-                error={errors.nik}
-                placeholder="16 digit"
-                maxLength={16}
-              />
             </div>
 
             <div>
