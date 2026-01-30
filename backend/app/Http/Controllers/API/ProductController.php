@@ -19,8 +19,13 @@ class ProductController extends Controller
             'productDetails',
             'productDetails.photos',
             'productDetails.size',
+
             'productDetails.color'
-        ]);
+        ])
+        ->whereHas('productDetails', function($q) {
+            $q->where('stock', '>', 0)
+              ->where('status', 'available');
+        });
 
         // Search by name
         if ($request->has('search')) {
