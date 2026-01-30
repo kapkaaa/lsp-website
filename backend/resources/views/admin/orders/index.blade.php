@@ -137,6 +137,8 @@
                                             <span class="badge badge-warning">Pending</span>
                                         @elseif($order->payment_status == 'paid')
                                             <span class="badge badge-success">Paid</span>
+                                        @elseif($order->payment_status == 'refunded')
+                                            <span class="badge badge-info">Refunded</span>
                                         @else
                                             <span class="badge badge-danger">Rejected</span>
                                         @endif
@@ -150,6 +152,8 @@
                                             <span class="badge badge-primary">Shipped</span>
                                         @elseif($order->order_status == 'completed')
                                             <span class="badge badge-success">Completed</span>
+                                        @elseif($order->order_status == 'refunded')
+                                            <span class="badge badge-info">Refunded</span>
                                         @else
                                             <span class="badge badge-danger">Cancelled</span>
                                         @endif
