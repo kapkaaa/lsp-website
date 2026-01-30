@@ -333,7 +333,7 @@ const Cart: React.FC = () => {
                     // Check operational hours before proceeding to checkout
                     try {
                       const response = await apiClient.get('/operational-hours/status', {
-                        params: { service_type: 'online' }
+                        params: { service_type: 'Website' }
                       });
 
                       const { is_operational, message } = response.data;
