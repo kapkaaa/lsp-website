@@ -39,7 +39,7 @@ class ProductController extends Controller
             $query->where('type_id', $request->type_id);
         }
 
-        $products = $query->paginate(10);
+        $products = $query->get();
         $brands = Brand::all();
         $types = Type::all();
 
