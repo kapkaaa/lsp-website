@@ -207,4 +207,62 @@ class OrderController extends Controller
                 ->with('error', 'Failed to refund order: ' . $e->getMessage());
         }
     }
+    public function approveRefundRequest(Request $request, Order $order)
+    {
+        if (!$order->isRefundRequested()) {
+            return redirect()->back()->with('error', 'No refund requested for this order');
+        }
+
+        try {
+            DB::beginTransaction();
+
+            // Use existing refund logic
+            $order->payment_status = 'refunded';
+            $order->order_status = 'refunded';
+            $order->refund_request_status = 'approved';
+            $order->approved_by = auth()->id();
+            $order->save();
+
+            // Restore stock
+            foreach ($order->orderDetails as $detail) {
+                if ($detail->product_detail) {
+                    $detail->product_detail->increaseStock($detail->quantity);
+                }
+            }
+
+            DB::commit();
+
+            return redirect()->back()
+                ->with('success', 'Refund request approved. Order refunded and stock restored.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()
+                ->with('error', 'Failed to approve refund: ' . $e->getMessage());
+        }
+    }
+
+    public function rejectRefundRequest(Request $request, Order $order)
+    {
+        if (!$order->isRefundRequested()) {
+            return redirect()->back()->with('error', 'No refund requested for this order');
+        }
+
+        $validated = $request->validate([
+            'rejection_reason' => 'required|string|max:500'
+        ]);
+
+        try {
+            $order->update([
+                'refund_request_status' => 'rejected',
+                'refund_rejection_reason' => $validated['rejection_reason'],
+                'approved_by' => auth()->id()
+            ]);
+
+            return redirect()->back()
+                ->with('success', 'Refund request rejected.');
+        } catch (\Exception $e) {
+            return redirect()->back()
+                ->with('error', 'Failed to reject refund: ' . $e->getMessage());
+        }
+    }
 }

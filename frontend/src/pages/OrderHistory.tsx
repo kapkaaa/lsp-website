@@ -28,6 +28,8 @@ interface Order {
   payment_method: string;
   payment_proof: string | null;
   payment_proof_url: string | null;
+  refund_request_status: string | null;
+  refund_reason: string | null;
   created_at: string;
   order_details: Array<{
     product_detail: {
@@ -50,6 +52,11 @@ const OrderHistory: React.FC = () => {
   const [showModal, setShowModal] = useState(false);
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [canceling, setCanceling] = useState(false);
+
+  // Refund States
+  const [refundReason, setRefundReason] = useState('');
+  const [showRefundModal, setShowRefundModal] = useState(false);
+  const [refunding, setRefunding] = useState(false);
 
   useEffect(() => {
     if (!isLoading) {
@@ -91,6 +98,28 @@ const OrderHistory: React.FC = () => {
     }
   };
 
+  const handleRequestRefund = async () => {
+    if (!selectedOrder || !refundReason.trim()) return;
+
+    setRefunding(true);
+    try {
+      await apiClient.post(`/orders/${selectedOrder.id}/refund-request`, {
+        reason: refundReason
+      });
+      swal.success('Berhasil!', 'Pengajuan pengembalian berhasil dikirim');
+      setShowRefundModal(false);
+      setRefundReason('');
+      setShowModal(false); // Close detail modal too
+      setSelectedOrder(null);
+      fetchOrders();
+    } catch (error: any) {
+      console.error('Failed to request refund:', error);
+      swal.error('Gagal!', error.response?.data?.message || 'Gagal mengajukan pengembalian');
+    } finally {
+      setRefunding(false);
+    }
+  };
+
   const getStatusBadge = (status: string) => {
     const statusMap: Record<string, { variant: any; label: string; icon: any }> = {
       pending: { variant: 'warning', label: 'Menunggu Verifikasi', icon: ClockIcon },
@@ -98,6 +127,7 @@ const OrderHistory: React.FC = () => {
       shipped: { variant: 'primary', label: 'Dalam Pengiriman', icon: TruckIcon },
       completed: { variant: 'success', label: 'Selesai', icon: CheckCircleIcon },
       cancelled: { variant: 'error', label: 'Dibatalkan', icon: XCircleIcon },
+      refunded: { variant: 'info', label: 'Dikembalikan', icon: CheckCircleIcon },
     };
 
     const config = statusMap[status] || statusMap.pending;
@@ -109,6 +139,13 @@ const OrderHistory: React.FC = () => {
         {config.label}
       </Badge>
     );
+  };
+
+  // Helper to check if refund is possible
+  const canRequestRefund = (order: Order) => {
+    return ['verified', 'shipped', 'completed'].includes(order.order_status)
+      && order.payment_status === 'paid'
+      && !order.refund_request_status;
   };
 
   const filteredOrders = filter === 'all'
@@ -135,60 +172,18 @@ const OrderHistory: React.FC = () => {
         {/* Filters */}
         <div className="bg-white rounded-xl shadow-sm p-4 mb-6">
           <div className="flex flex-wrap gap-2">
-            <button
-              onClick={() => setFilter('all')}
-              className={`px-4 py-2 rounded-lg font-medium transition-colors ${filter === 'all'
-                ? 'bg-cyan-500 text-white'
-                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                }`}
-            >
-              Semua
-            </button>
-            <button
-              onClick={() => setFilter('pending')}
-              className={`px-4 py-2 rounded-lg font-medium transition-colors ${filter === 'pending'
-                ? 'bg-cyan-500 text-white'
-                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                }`}
-            >
-              Menunggu Verifikasi
-            </button>
-            <button
-              onClick={() => setFilter('verified')}
-              className={`px-4 py-2 rounded-lg font-medium transition-colors ${filter === 'verified'
-                ? 'bg-cyan-500 text-white'
-                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                }`}
-            >
-              Terverifikasi
-            </button>
-            <button
-              onClick={() => setFilter('shipped')}
-              className={`px-4 py-2 rounded-lg font-medium transition-colors ${filter === 'shipped'
-                ? 'bg-cyan-500 text-white'
-                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                }`}
-            >
-              Dalam Pengiriman
-            </button>
-            <button
-              onClick={() => setFilter('completed')}
-              className={`px-4 py-2 rounded-lg font-medium transition-colors ${filter === 'completed'
-                ? 'bg-cyan-500 text-white'
-                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                }`}
-            >
-              Selesai
-            </button>
-            <button
-              onClick={() => setFilter('cancelled')}
-              className={`px-4 py-2 rounded-lg font-medium transition-colors ${filter === 'cancelled'
-                ? 'bg-cyan-500 text-white'
-                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                }`}
-            >
-              Dibatalkan
-            </button>
+            {['all', 'pending', 'verified', 'shipped', 'completed', 'cancelled'].map((status) => (
+              <button
+                key={status}
+                onClick={() => setFilter(status)}
+                className={`px-4 py-2 rounded-lg font-medium transition-colors ${filter === status
+                  ? 'bg-cyan-500 text-white'
+                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  }`}
+              >
+                {status === 'all' ? 'Semua' : status.charAt(0).toUpperCase() + status.slice(1)}
+              </button>
+            ))}
           </div>
         </div>
 
@@ -222,6 +217,11 @@ const OrderHistory: React.FC = () => {
                         {order.order_code}
                       </h3>
                       {getStatusBadge(order.order_status)}
+                      {order.refund_request_status && (
+                        <Badge variant={order.refund_request_status === 'approved' ? 'success' : (order.refund_request_status === 'rejected' ? 'error' : 'info')}>
+                          Refund: {order.refund_request_status}
+                        </Badge>
+                      )}
                     </div>
                     <p className="text-sm text-gray-600">
                       {formatDateTime(order.created_at)}
@@ -241,7 +241,7 @@ const OrderHistory: React.FC = () => {
                 <div className="mb-4 py-4 border-t border-b border-gray-200">
                   {Array.isArray(order.order_details) && order.order_details.slice(0, 2).map((detail, index) => (
                     <p key={index} className="text-sm text-gray-600">
-                      • {detail.product_detail?.product?.name || 'Produk'} × {detail.quantity}
+                      {detail.product_detail?.product?.name || 'Produk'} × {detail.quantity}
                     </p>
                   ))}
                   {Array.isArray(order.order_details) && order.order_details.length > 2 && (
@@ -307,6 +307,13 @@ const OrderHistory: React.FC = () => {
               <div>
                 <h4 className="font-semibold text-gray-900 mb-2">Status</h4>
                 <div>{getStatusBadge(selectedOrder.order_status)}</div>
+                {selectedOrder.refund_request_status && (
+                  <div className="mt-2 text-sm">
+                    <p className="font-semibold">Status Pengembalian:</p>
+                    <p className="capitalize">{selectedOrder.refund_request_status}</p>
+                    {selectedOrder.refund_reason && <p className="text-gray-600 italic">"Alasan: {selectedOrder.refund_reason}"</p>}
+                  </div>
+                )}
               </div>
 
               <div>
@@ -355,6 +362,19 @@ const OrderHistory: React.FC = () => {
                   />
                 </div>
               )}
+
+              {/* Refund Button */}
+              {canRequestRefund(selectedOrder) && (
+                <div className="border-t border-gray-200 pt-4">
+                  <Button
+                    variant="secondary"
+                    onClick={() => setShowRefundModal(true)}
+                    className="w-full text-red-600 border-red-200 hover:bg-red-50"
+                  >
+                    Ajukan Pengembalian
+                  </Button>
+                </div>
+              )}
             </div>
           )}
         </Modal>
@@ -390,6 +410,50 @@ const OrderHistory: React.FC = () => {
                 loading={canceling}
               >
                 Ya, Batalkan
+              </Button>
+            </div>
+          </div>
+        </Modal>
+
+        {/* Refund Request Modal */}
+        <Modal
+          isOpen={showRefundModal}
+          onClose={() => !refunding && setShowRefundModal(false)}
+          title="Ajukan Pengembalian Dana"
+          size="md"
+        >
+          <div className="space-y-4">
+            <p className="text-sm text-gray-600">
+              Silakan jelaskan alasan Anda ingin mengajukan pengembalian dana untuk pesanan <span className="font-semibold">{selectedOrder?.order_code}</span>.
+            </p>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Alasan Pengembalian</label>
+              <textarea
+                className="w-full rounded-lg border-gray-300 shadow-sm focus:border-cyan-500 focus:ring-cyan-500"
+                rows={4}
+                value={refundReason}
+                onChange={(e) => setRefundReason(e.target.value)}
+                placeholder="Contoh: Barang cacat, ukuran tidak sesuai, dll."
+              ></textarea>
+              {refundReason.length < 10 && refundReason.length > 0 && (
+                <p className="text-xs text-red-500 mt-1">Alasan minimal 10 karakter.</p>
+              )}
+            </div>
+            <div className="flex justify-end gap-3 pt-2">
+              <Button
+                variant="outline"
+                onClick={() => setShowRefundModal(false)}
+                disabled={refunding}
+              >
+                Batal
+              </Button>
+              <Button
+                variant="primary"
+                onClick={handleRequestRefund}
+                disabled={refundReason.length < 10}
+                loading={refunding}
+              >
+                Kirim Pengajuan
               </Button>
             </div>
           </div>

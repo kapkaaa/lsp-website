@@ -56,8 +56,21 @@
                             @if($order->order_status != 'cancelled' && $order->approver)
                             <strong>Verified By:</strong> {{ $order->approver->name }}
                             @endif
-                            @if ($order->order_status == 'cancelled')
+                            @if($order->order_status == 'cancelled')
                             <strong>Rejected By:</strong> {{ $order->approver->name }}
+                            @endif
+                            
+                            @if($order->refund_request_status)
+                            <br><strong>Refund Request:</strong>
+                            <span class="badge badge-{{ $order->refund_request_status == 'approved' ? 'success' : ($order->refund_request_status == 'rejected' ? 'danger' : 'warning') }}">
+                                {{ ucfirst($order->refund_request_status) }}
+                            </span>
+                            @if($order->refund_reason)
+                            <br><strong>Reason:</strong> <em class="text-muted">"{{ $order->refund_reason }}"</em>
+                            @endif
+                            @if($order->refund_rejection_reason)
+                            <br><strong>Rejection Reason:</strong> <em class="text-danger">"{{ $order->refund_rejection_reason }}"</em>
+                            @endif
                             @endif
                         </div>
                     </div>
@@ -181,11 +194,26 @@
                     </form>
                     @endif
 
-                    @if($order->canBeRefunded())
+
+
+                    @if($order->isRefundRequested())
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-triangle"></i> Customer requested a refund.
+                    </div>
+                    <form action="{{ route('admin.orders.refund-request.approve', $order->id) }}" method="POST" class="mb-2">
+                        @csrf
+                        <button type="submit" class="btn btn-warning btn-block" onclick="return confirm('Approve refund request? Order will be refunded and stock restored.')">
+                            <i class="fas fa-check"></i> Approve Refund
+                        </button>
+                    </form>
+                    <button type="button" class="btn btn-danger btn-block mb-2" data-toggle="modal" data-target="#rejectRefundModal">
+                        <i class="fas fa-times"></i> Reject Refund Request
+                    </button>
+                    @elseif($order->canBeRefunded())
                     <form action="{{ route('admin.orders.refund', $order->id) }}" method="POST" class="mb-2">
                         @csrf
                         <button type="submit" class="btn btn-warning btn-block" onclick="return confirm('Are you sure you want to REFUND this order? Stock will be restored and this order will be EXCLUDED from reports.')">
-                            <i class="fas fa-undo"></i> Refund Order
+                            <i class="fas fa-undo"></i> Force Refund Order
                         </button>
                     </form>
                     @endif
@@ -266,6 +294,36 @@
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
                     <button type="submit" class="btn btn-danger">Reject Payment</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<!-- Reject Refund Modal -->
+<div class="modal fade" id="rejectRefundModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form action="{{ route('admin.orders.refund-request.reject', $order->id) }}" method="POST">
+                @csrf
+                <div class="modal-header bg-danger">
+                    <h5 class="modal-title text-white">Reject Refund Request</h5>
+                    <button type="button" class="close text-white" data-dismiss="modal">
+                        <span>&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>Rejection Reason <span class="text-danger">*</span></label>
+                        <textarea class="form-control"
+                            name="rejection_reason"
+                            rows="3"
+                            placeholder="Why is the refund being rejected?"
+                            required></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-danger">Reject Refund</button>
                 </div>
             </form>
         </div>

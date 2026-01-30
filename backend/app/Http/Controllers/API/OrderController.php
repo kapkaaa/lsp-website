@@ -197,4 +197,33 @@ class OrderController extends Controller
             ], 500);
         }
     }
+    public function requestRefund(Request $request, $id)
+    {
+        $user = $request->user();
+        
+        $order = Order::where('id', $id)
+            ->where('buyer_id', $user->id)
+            ->firstOrFail();
+
+        if (!$order->canRequestRefund()) {
+            return response()->json([
+                'message' => 'Pesanan tidak memenuhi syarat untuk pengajuan pengembalian (harus verified/shipped/completed, sudah dibayar, dan belum ada pengajuan)'
+            ], 400);
+        }
+
+        $request->validate([
+            'reason' => 'required|string|min:10|max:500'
+        ]);
+
+        $order->update([
+            'refund_request_status' => 'requested',
+            'refund_reason' => $request->reason,
+            'refund_request_date' => now()
+        ]);
+
+        return response()->json([
+            'message' => 'Pengajuan pengembalian berhasil dikirim',
+            'data' => $order
+        ]);
+    }
 }

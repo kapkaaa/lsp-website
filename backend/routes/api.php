@@ -41,6 +41,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('/orders', [OrderController::class, 'store']);
     Route::get('/orders/{id}', [OrderController::class, 'show']);
     Route::post('/orders/{id}/cancel', [OrderController::class, 'cancel']);
+    Route::post('/orders/{id}/refund-request', [OrderController::class, 'requestRefund']);
     
     // Chat routes
     Route::get('/chat/messages', [ChatController::class, 'getMessages']);

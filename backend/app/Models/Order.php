@@ -20,7 +20,11 @@ class Order extends Model
         'payment_proof',
         'payment_status',
         'order_status',
-        'payment_method'
+        'payment_method',
+        'refund_request_status',
+        'refund_reason',
+        'refund_rejection_reason',
+        'refund_request_date'
     ];
 
     protected $appends = ['payment_proof_url'];
@@ -124,7 +128,19 @@ class Order extends Model
 
     public function canBeRefunded()
     {
-        return in_array($this->order_status, ['verified', 'shipped', 'completed']) && $this->payment_status === 'paid';
+        return in_array($this->order_status, ['verified', 'shipped', 'completed']) && $this->payment_status === 'paid' && !$this->isRefundRequested();
+    }
+
+    public function isRefundRequested()
+    {
+        return $this->refund_request_status === 'requested';
+    }
+
+    public function canRequestRefund()
+    {
+        return in_array($this->order_status, ['verified', 'shipped', 'completed']) 
+            && $this->payment_status === 'paid' 
+            && is_null($this->refund_request_status);
     }
 
     public function getPaymentProofUrlAttribute()

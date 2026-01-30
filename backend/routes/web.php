@@ -155,6 +155,8 @@ Route::middleware(['auth', 'role:Admin,Cashier'])->prefix('admin')->name('admin.
         Route::post('/{order}/reject-payment', [AdminOrderController::class, 'reject'])->name('reject-payment');
         Route::put('/{order}/status', [AdminOrderController::class, 'updateStatus'])->name('update-status');
         Route::post('/{order}/refund', [AdminOrderController::class, 'refund'])->name('refund');
+        Route::post('/{order}/refund-request/approve', [AdminOrderController::class, 'approveRefundRequest'])->name('refund-request.approve');
+        Route::post('/{order}/refund-request/reject', [AdminOrderController::class, 'rejectRefundRequest'])->name('refund-request.reject');
     });
     
     // Customer Service
