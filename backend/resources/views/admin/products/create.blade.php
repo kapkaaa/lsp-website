@@ -8,12 +8,55 @@
     <li class="breadcrumb-item active">Create</li>
 @endsection
 
+@push('css')
+<style>
+/* Sidebar fixed di kanan, full height */
+.sidebar-fixed {
+    position: fixed;
+    top: 70px; /* Sesuaikan dengan tinggi navbar */
+    right: 15px;
+    width: 25%;
+    max-width: 350px;
+    min-height: 100vh;
+    z-index: 1000;
+    background: #fff;
+    padding: 20px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    overflow-y: auto; /* Allow scrolling within sidebar if too tall */
+    max-height: calc(100vh - 80px);
+}
+
+/* Beri ruang ke main content agar tidak tertutup sidebar */
+.main-content-with-fixed-sidebar {
+    margin-right: 26%;
+    padding-right: 20px;
+}
+
+/* Responsif: nonaktifkan fixed di mobile */
+@media (max-width: 991.98px) {
+    .sidebar-fixed {
+        position: static;
+        width: auto;
+        margin-top: 20px;
+        right: auto;
+        min-height: auto;
+        box-shadow: none;
+        max-height: none;
+    }
+    .main-content-with-fixed-sidebar {
+        margin-right: 0;
+        padding-right: 0;
+    }
+}
+</style>
+@endpush
+
 @section('main_content')
 <div class="container-fluid">
     <form action="{{ route('admin.products.store') }}" method="POST" enctype="multipart/form-data" id="productForm">
         @csrf
         <div class="row">
-            <div class="col-md-8">
+            <div class="col-md-8 main-content-with-fixed-sidebar">
                 <div class="card">
                     <div class="card-header">
                         <h3 class="card-title">Product Information</h3>
@@ -127,42 +170,47 @@
                 </div>
             </div>
 
-            <div class="col-md-4">
-                <div class="card">
-                    <div class="card-header">
-                        <h3 class="card-title">Actions</h3>
-                    </div>
-                    <div class="card-body">
-                        <button type="submit" class="btn btn-primary btn-block">
-                            <i class="fas fa-save"></i> Save Product
-                        </button>
-                        <a href="{{ route('admin.products.index') }}" class="btn btn-secondary btn-block">
-                            <i class="fas fa-times"></i> Cancel
-                        </a>
-                    </div>
-                </div>
-
-                <div class="card">
-                    <div class="card-header">
-                        <h3 class="card-title">Quick Reference</h3>
-                    </div>
-                    <div class="card-body">
-                        <p class="text-sm"><strong>Available Sizes:</strong></p>
-                        <div class="mb-2">
-                            @foreach($sizes as $size)
-                                <span class="badge badge-secondary">{{ $size->name }}</span>
-                            @endforeach
-                        </div>
-                        <p class="text-sm"><strong>Available Colors:</strong></p>
-                        <div>
-                            @foreach($colors as $color)
-                                <span class="badge badge-info">{{ $color->name }}</span>
-                            @endforeach
-                        </div>
-                    </div>
-                </div>
             </div>
         </div>
+    </form>
+</div>
+
+<!-- SIDEBAR FIXED OUTSIDE CONTAINER -->
+<div class="sidebar-fixed">
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <h3 class="card-title">Actions</h3>
+        </div>
+        <div class="card-body">
+            <button type="submit" form="productForm" class="btn btn-primary btn-block">
+                <i class="fas fa-save"></i> Save Product
+            </button>
+            <a href="{{ route('admin.products.index') }}" class="btn btn-secondary btn-block">
+                <i class="fas fa-times"></i> Cancel
+            </a>
+        </div>
+    </div>
+
+    <div class="card shadow-sm mt-3">
+        <div class="card-header bg-info text-white">
+            <h3 class="card-title">Quick Reference</h3>
+        </div>
+        <div class="card-body">
+            <p class="text-sm"><strong>Available Sizes:</strong></p>
+            <div class="mb-2">
+                @foreach($sizes as $size)
+                    <span class="badge badge-secondary">{{ $size->name }}</span>
+                @endforeach
+            </div>
+            <p class="text-sm"><strong>Available Colors:</strong></p>
+            <div>
+                @foreach($colors as $color)
+                    <span class="badge badge-info">{{ $color->name }}</span>
+                @endforeach
+            </div>
+        </div>
+    </div>
+</div>
     </form>
 </div>
 
