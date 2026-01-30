@@ -159,6 +159,20 @@ class ProductController extends Controller
         // Update product info
         $product->update($validated);
 
+        // Process deleted photos
+        if ($request->has('delete_photo_ids')) {
+            foreach ($request->delete_photo_ids as $photoId) {
+                $photo = ProductPhoto::find($photoId);
+                if ($photo) {
+                    $path = ProductPhoto::extractPathFromUrl($photo->getRawOriginal('photo_url'));
+                    if ($path) {
+                        \Illuminate\Support\Facades\Storage::disk('supabase')->delete($path);
+                    }
+                    $photo->delete();
+                }
+            }
+        }
+
         // Ambil ID semua variant yang dikirim dari form
         $incomingVariantIds = collect($validated['variants'])
             ->pluck('id')

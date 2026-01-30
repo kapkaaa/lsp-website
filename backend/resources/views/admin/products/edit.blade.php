@@ -174,9 +174,30 @@
                                             <input type="number" class="form-control" name="variants[{{ $index }}][stock]" min="0" value="{{ old("variants.{$index}.stock", $variant->stock) }}" required>
                                         </div>
                                         <div class="col-md-3">
-                                            <label>Photos (Add New)</label>
+                                            <label>Photos</label>
+                                            <!-- Existing Photos -->
+                                            @if($variant->photos->count() > 0)
+                                            <div class="d-flex flex-wrap mb-2">
+                                                @foreach($variant->photos as $photo)
+                                                <div class="position-relative mr-2 mb-2 existing-photo-item" id="photo-{{ $photo->id }}">
+                                                    <img src="{{ $photo->photo_url }}" 
+                                                         class="img-thumbnail" 
+                                                         style="width: 60px; height: 60px; object-fit: cover; cursor: pointer;"
+                                                         onclick="showImagePreview('{{ $photo->photo_url }}')"
+                                                         alt="Variant Photo">
+                                                    <button type="button" 
+                                                            class="btn btn-xs btn-danger position-absolute" 
+                                                            style="top: -5px; right: -5px; border-radius: 50%; padding: 0 4px;"
+                                                            onclick="markPhotoForDeletion({{ $photo->id }})">
+                                                        &times;
+                                                    </button>
+                                                </div>
+                                                @endforeach
+                                            </div>
+                                            @endif
+                                            
                                             <input type="file" class="form-control-file" name="variants[{{ $index }}][photos][]" multiple accept="image/*">
-                                            <small class="text-muted d-block">Existing photos won’t be shown. Only new uploads will be added.</small>
+                                            <small class="text-muted d-block">Upload new photos to add.</small>
                                         </div>
                                     </div>
                                     <button type="button" class="btn btn-sm btn-outline-danger mt-2 remove-variant">
@@ -288,6 +309,24 @@
 </template>
 @endsection
 
+<!-- Image Preview Modal -->
+<div class="modal fade" id="imagePreviewModal" tabindex="-1" role="dialog" aria-labelledby="imagePreviewModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="imagePreviewModalLabel">Image Preview</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body text-center bg-dark">
+                <img src="" id="previewImage" class="img-fluid" style="max-height: 80vh;" alt="Preview">
+            </div>
+        </div>
+    </div>
+</div>
+
+
 @push('js')
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
@@ -357,6 +396,44 @@
         }).then((result) => {
             if (result.isConfirmed) {
                 document.getElementById(formId).submit();
+            }
+        });
+    }
+
+    // Image Preview Global Function
+    window.showImagePreview = function(url) {
+        $('#previewImage').attr('src', url);
+        $('#imagePreviewModal').modal('show');
+    }
+
+    // Mark for Deletion Global Function
+    window.markPhotoForDeletion = function(photoId) {
+        Swal.fire({
+            title: 'Delete this photo?',
+            text: "It will be removed upon saving changes.",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Yes, remove it!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Remove the UI element
+                $(`#photo-${photoId}`).remove();
+                
+                // Add hidden input to the form
+                const input = `<input type="hidden" name="delete_photo_ids[]" value="${photoId}">`;
+                $('#productForm').append(input);
+                
+                // Optional: Show temporary success message
+                Swal.fire({
+                    toast: true,
+                    position: 'top-end',
+                    icon: 'success',
+                    title: 'Photo marked for deletion',
+                    showConfirmButton: false,
+                    timer: 3000
+                });
             }
         });
     }

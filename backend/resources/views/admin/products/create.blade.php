@@ -202,8 +202,16 @@
                 <div class="col-md-3">
                     <div class="form-group">
                         <label>Photos</label>
-                        <input type="file" class="form-control-file" name="variants[INDEX][photos][]" multiple accept="image/*">
-                        <small class="text-muted">Max 5 photos</small>
+                        <div class="d-flex align-items-center">
+                            <!-- Hidden actual input -->
+                            <input type="file" class="d-none variant-photos-input" name="variants[INDEX][photos][]" multiple accept="image/*">
+                            
+                            <!-- Manager Trigger -->
+                            <button type="button" class="btn btn-outline-primary btn-sm manage-photos">
+                                <i class="fas fa-images"></i> Tambah Image <span class="badge badge-primary photo-count ml-1">0</span>
+                            </button>
+                        </div>
+                        <small class="text-muted mt-1 d-block">Click to manage photos</small>
                     </div>
                 </div>
             </div>
@@ -218,6 +226,43 @@
     </div>
 </template>
 @endsection
+
+<!-- Advanced Image Manager Modal -->
+<div class="modal fade" id="imageManagerModal" tabindex="-1" role="dialog" aria-labelledby="imageManagerModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="imageManagerModalLabel">Manage Variant Photos</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body bg-light">
+                <!-- Toolbar -->
+                <div class="mb-3">
+                    <button type="button" class="btn btn-success" id="btnAddNewPhoto">
+                        <i class="fas fa-plus"></i> Add Photos
+                    </button>
+                    <input type="file" id="tempPhotoInput" multiple accept="image/*" class="d-none">
+                    <span class="text-muted ml-2">Selected: <span id="managerPhotoCount">0</span></span>
+                </div>
+
+                <!-- Grid -->
+                <div id="managerPhotoGrid" class="d-flex flex-wrap border rounded p-3 bg-white" style="min-height: 200px; align-content: flex-start;">
+                    <!-- Photos will be injected here -->
+                    <div class="w-100 text-center text-muted align-self-center empty-state">
+                        No photos selected
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="btnSavePhotos">Done</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 
 @push('js')
 <script>
@@ -261,6 +306,101 @@ $(document).ready(function() {
             });
             return false;
         }
+    });
+
+    // Advanced Image Manager Logic
+    let currentManagerTargetInput = null; // The hidden input we are editing
+    let managerFiles = []; // Array to hold File objects
+
+    // Open Manager
+    $(document).on('click', '.manage-photos', function() {
+        const formGroup = $(this).closest('.form-group');
+        currentManagerTargetInput = formGroup.find('.variant-photos-input');
+        
+        // Load existing files
+        managerFiles = Array.from(currentManagerTargetInput[0].files || []);
+        
+        renderManagerGrid();
+        $('#imageManagerModal').modal('show');
+    });
+
+    // Add Photos Button
+    $('#btnAddNewPhoto').on('click', function() {
+        $('#tempPhotoInput').click();
+    });
+
+    // Handle File Selection
+    $('#tempPhotoInput').on('change', function() {
+        if (this.files && this.files.length > 0) {
+            Array.from(this.files).forEach(file => {
+                managerFiles.push(file);
+            });
+            renderManagerGrid();
+        }
+        // Reset temp input so same files can be selected again if needed
+        $(this).val('');
+    });
+
+    // Render Grid
+    function renderManagerGrid() {
+        const grid = $('#managerPhotoGrid');
+        const countSpan = $('#managerPhotoCount');
+        
+        grid.empty();
+        countSpan.text(managerFiles.length);
+
+        if (managerFiles.length === 0) {
+            grid.append('<div class="w-100 text-center text-muted align-self-center empty-state">No photos selected</div>');
+            return;
+        }
+
+        managerFiles.forEach((file, index) => {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const item = $(`
+                    <div class="position-relative m-2 shadow-sm border rounded" style="width: 100px; height: 100px;">
+                        <img src="${e.target.result}" class="w-100 h-100" style="object-fit: cover; border-radius: 4px;">
+                        <button type="button" class="btn btn-danger btn-xs position-absolute d-flex align-items-center justify-content-center" 
+                                style="top: -8px; right: -8px; width: 20px; height: 20px; border-radius: 50%; padding: 0;"
+                                data-index="${index}">
+                            &times;
+                        </button>
+                    </div>
+                `);
+                
+                // Bind delete event specifically to this closure to capture correct index at render time? 
+                // Better to use data-index and delegate
+                grid.append(item);
+            }
+            reader.readAsDataURL(file);
+        });
+    }
+
+    // Remove Photo from Manager
+    $(document).on('click', '#managerPhotoGrid button', function() {
+        const index = $(this).data('index');
+        managerFiles.splice(index, 1);
+        renderManagerGrid();
+    });
+
+    // Save Changes
+    $('#btnSavePhotos').on('click', function() {
+        if (!currentManagerTargetInput) return;
+
+        // Use DataTransfer to reconstruct FileList
+        const dataTransfer = new DataTransfer();
+        managerFiles.forEach(file => {
+            dataTransfer.items.add(file);
+        });
+
+        // Update target input
+        currentManagerTargetInput[0].files = dataTransfer.files;
+
+        // Update UI Badge
+        const formGroup = currentManagerTargetInput.closest('.form-group');
+        formGroup.find('.photo-count').text(managerFiles.length);
+
+        $('#imageManagerModal').modal('hide');
     });
 });
 </script>
